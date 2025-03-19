@@ -1,0 +1,16 @@
+// This configuration file is for a TypeScript project.
+// It specifies the compiler options and the files to include and exclude from the compilation.
+{
+  "compilerOptions": {
+    "outDir": "./dist", 
+    "rootDir": "./src",  
+    "target": "es2016",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
