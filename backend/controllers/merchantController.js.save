@@ -1,0 +1,16 @@
+export const getMerchants = (req, res) => {
+    res.send("Get Merchants Placeholder");
+};
+
+export const createMerchant = (req, res) => {
+    res.send("Create Merchant Placeholder");
+};
+
+export const updateMerchant = (req, res) => {
+    res.send("Update Merchant Placeholder");
+};
+
+export const deleteMerchant = (req, res) => {
+    res.send("Delete Merchant Placeholder");
+};
+
