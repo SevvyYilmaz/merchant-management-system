@@ -1,0 +1,96 @@
+<div>
+  <div ng-repeat="merchant in $ctrl.paginatedMerchants()" class="merchant">
+    <h3>{{ merchant.merchantName }} ({{ merchant.merchantAccount }})</h3>
+    <p>{{ merchant.address.city }}, {{ merchant.address.state }} {{ merchant.address.zip }}</p>
+    <p>Phone: {{ merchant.address.phone }}</p>
+
+    <!-- 🟢 Status Badge -->
+    <p>Status: 
+      <span ng-class="{
+        'badge badge-success': merchant.status === 'active',
+        'badge badge-danger': merchant.status === 'inactive'
+      }">{{ merchant.status }}</span>
+    </p>
+
+    <!-- 🐞 Debug Info -->
+    <p><strong>DEBUG ID:</strong> {{ merchant._id }}</p>
+
+    <!-- 💳 Devices Section (Hardcoded) -->
+    <p><strong>Devices:</strong></p>
+    <ul>
+      <li>Pax A920 - SN123456</li>
+      <li>Deja Vu VX520 - SN789123</li>
+    </ul>
+
+    <!-- 💰 Residuals Section (Hardcoded) -->
+    <p><strong>Residuals (Feb 2025):</strong> $314.20</p>
+
+    <!-- 🔧 Actions (Styled Buttons) -->
+    <div class="actions">
+      <a href="#!/merchants/edit/{{merchant._id}}" class="btn btn-edit">✏️ Edit</a>
+      <button ng-click="$ctrl.deleteMerchant(merchant._id)" class="btn btn-delete">🗑️ Delete</button>
+      <a href="#!/profile/{{merchant._id}}" class="btn btn-view">👁 View Profile</a>
+    </div>
+
+    <hr>
+  </div>
+
+  <!-- 🔄 Pagination Controls -->
+  <div class="pagination">
+    <button ng-click="$ctrl.prevPage()" ng-disabled="$ctrl.currentPage === 1">⬅ Prev</button>
+    Page {{$ctrl.currentPage}} of {{$ctrl.totalPages()}}
+    <button ng-click="$ctrl.nextPage()" ng-disabled="$ctrl.currentPage === $ctrl.totalPages()">Next ➡</button>
+  </div>
+</div>
+
+<!-- 💄 Styling -->
+<style>
+  .badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+  }
+  .badge-success { background-color: #28a745; }
+  .badge-danger { background-color: #dc3545; }
+
+  .actions {
+    margin-top: 10px;
+  }
+
+  .btn {
+    margin-right: 10px;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-edit {
+    background-color: #ffc107;
+    color: black;
+  }
+
+  .btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+  }
+
+  .btn-view {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .pagination {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .pagination button {
+    margin: 0 8px;
+    padding: 5px 12px;
+    font-size: 14px;
+  }
+</style>

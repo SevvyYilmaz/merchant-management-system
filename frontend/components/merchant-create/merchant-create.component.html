@@ -1,0 +1,25 @@
+<div>
+    <h2>Create Merchant</h2>
+    <form ng-submit="$ctrl.submitForm()">
+      <label>Merchant Name:</label>
+      <input type="text" ng-model="$ctrl.form.merchantName" required /><br>
+  
+      <label>Merchant Account:</label>
+      <input type="text" ng-model="$ctrl.form.merchantAccount" required /><br>
+  
+      <label>City:</label>
+      <input type="text" ng-model="$ctrl.form.address.city" /><br>
+  
+      <label>State:</label>
+      <input type="text" ng-model="$ctrl.form.address.state" /><br>
+  
+      <label>Zip:</label>
+      <input type="text" ng-model="$ctrl.form.address.zip" /><br>
+  
+      <label>Phone:</label>
+      <input type="text" ng-model="$ctrl.form.address.phone" /><br><br>
+  
+      <button type="submit">Create Merchant</button>
+    </form>
+  </div>
+  

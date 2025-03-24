@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="MerchantApp">
+<head>
+  <meta charset="UTF-8" />
+  <title>Merchant Dashboard</title>
+
+  <!-- AngularJS Core + Router -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+
+  <!-- App Core -->
+  <script src="app.js"></script>
+
+  <!-- Components -->
+  <script src="components/merchant-list/merchant-list.component.js"></script>
+  <script src="components/merchant-create/merchant-create.component.js"></script>
+  <script src="components/merchant-edit/merchant-edit.component.js"></script>
+  <script src="components/merchant-profile/merchant-profile.component.js"></script>
+
+
+</head>
+<body>
+  <h1>Merchant Dashboard</h1>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#!/">View Merchants</a> |
+    <a href="#!/create">Add Merchant</a>
+  </nav>
+
+  <!-- AngularJS Router Outlet -->
+  <div ng-view></div>
+</body>
+</html>
