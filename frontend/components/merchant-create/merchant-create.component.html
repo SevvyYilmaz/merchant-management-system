@@ -1,25 +1,100 @@
 <div>
-    <h2>Create Merchant</h2>
-    <form ng-submit="$ctrl.submitForm()">
+  <h2>Create Merchant</h2>
+
+  <form name="merchantForm" ng-submit="$ctrl.submitForm(merchantForm)" novalidate>
+
+    <!-- Merchant Name -->
+    <div class="form-group" ng-class="{ 'has-error': merchantForm.merchantName.$touched && merchantForm.merchantName.$invalid }">
       <label>Merchant Name:</label>
-      <input type="text" ng-model="$ctrl.form.merchantName" required /><br>
-  
+      <input type="text" name="merchantName" ng-model="$ctrl.form.merchantName" required />
+      <span class="error" ng-show="merchantForm.merchantName.$touched && merchantForm.merchantName.$invalid">
+        Merchant Name is required.
+      </span>
+    </div>
+
+    <!-- Merchant Account -->
+    <div class="form-group" ng-class="{ 'has-error': merchantForm.merchantAccount.$touched && merchantForm.merchantAccount.$invalid }">
       <label>Merchant Account:</label>
-      <input type="text" ng-model="$ctrl.form.merchantAccount" required /><br>
-  
+      <input type="text" name="merchantAccount" ng-model="$ctrl.form.merchantAccount" required />
+      <span class="error" ng-show="merchantForm.merchantAccount.$touched && merchantForm.merchantAccount.$invalid">
+        Merchant Account is required.
+      </span>
+    </div>
+
+    <!-- City -->
+    <div class="form-group" ng-class="{ 'has-error': merchantForm.city.$touched && merchantForm.city.$invalid }">
       <label>City:</label>
-      <input type="text" ng-model="$ctrl.form.address.city" /><br>
-  
+      <input type="text" name="city" ng-model="$ctrl.form.address.city" required />
+      <span class="error" ng-show="merchantForm.city.$touched && merchantForm.city.$invalid">
+        City is required.
+      </span>
+    </div>
+
+    <!-- State -->
+    <div class="form-group" ng-class="{ 'has-error': merchantForm.state.$touched && merchantForm.state.$invalid }">
       <label>State:</label>
-      <input type="text" ng-model="$ctrl.form.address.state" /><br>
-  
+      <input type="text" name="state" ng-model="$ctrl.form.address.state" required />
+      <span class="error" ng-show="merchantForm.state.$touched && merchantForm.state.$invalid">
+        State is required.
+      </span>
+    </div>
+
+    <!-- ZIP -->
+    <div class="form-group" ng-class="{ 'has-error': merchantForm.zip.$touched && merchantForm.zip.$invalid }">
       <label>Zip:</label>
-      <input type="text" ng-model="$ctrl.form.address.zip" /><br>
-  
+      <input type="text" name="zip" ng-model="$ctrl.form.address.zip" required />
+      <span class="error" ng-show="merchantForm.zip.$touched && merchantForm.zip.$invalid">
+        ZIP is required.
+      </span>
+    </div>
+
+    <!-- Phone -->
+    <div class="form-group" ng-class="{ 'has-error': merchantForm.phone.$touched && merchantForm.phone.$invalid }">
       <label>Phone:</label>
-      <input type="text" ng-model="$ctrl.form.address.phone" /><br><br>
-  
-      <button type="submit">Create Merchant</button>
-    </form>
-  </div>
-  
+      <input type="text" name="phone" ng-model="$ctrl.form.address.phone" required />
+      <span class="error" ng-show="merchantForm.phone.$touched && merchantForm.phone.$invalid">
+        Phone is required.
+      </span>
+    </div>
+
+    <!-- Global validation message -->
+    <p class="error" ng-show="merchantForm.$submitted && merchantForm.$invalid">
+      Please fill out all required fields.
+    </p>
+
+    <!-- Submit -->
+    <button type="submit" ng-disabled="merchantForm.$invalid">Create Merchant</button>
+  </form>
+</div>
+
+<style>
+  .error {
+    color: red;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .has-error input {
+    border: 1px solid red;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input {
+    width: 300px;
+    padding: 5px;
+  }
+
+  button {
+    margin-top: 10px;
+  }
+</style>

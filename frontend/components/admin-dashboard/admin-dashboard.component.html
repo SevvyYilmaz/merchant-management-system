@@ -1,0 +1,11 @@
+<h2>Admin Dashboard</h2>
+
+<div ng-if="$ctrl.loading">Loading...</div>
+<div ng-if="!$ctrl.loading">
+  <p><strong>Total Merchants:</strong> {{$ctrl.totals.merchants}}</p>
+  <p><strong>Total Users:</strong> {{$ctrl.totals.users}}</p>
+  <p><strong>Total Devices:</strong> {{$ctrl.totals.devices}}</p>
+
+  <h3>Residuals by Month</h3>
+  <canvas id="residualChart" width="600" height="300"></canvas>
+</div>

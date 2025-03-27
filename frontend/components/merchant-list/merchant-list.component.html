@@ -1,5 +1,5 @@
 <div>
-  <div ng-repeat="merchant in $ctrl.paginatedMerchants()" class="merchant">
+  <div ng-repeat="merchant in $ctrl.merchants" class="merchant">
     <h3>{{ merchant.merchantName }} ({{ merchant.merchantAccount }})</h3>
     <p>{{ merchant.address.city }}, {{ merchant.address.state }} {{ merchant.address.zip }}</p>
     <p>Phone: {{ merchant.address.phone }}</p>
@@ -38,8 +38,8 @@
   <!-- 🔄 Pagination Controls -->
   <div class="pagination">
     <button ng-click="$ctrl.prevPage()" ng-disabled="$ctrl.currentPage === 1">⬅ Prev</button>
-    Page {{$ctrl.currentPage}} of {{$ctrl.totalPages()}}
-    <button ng-click="$ctrl.nextPage()" ng-disabled="$ctrl.currentPage === $ctrl.totalPages()">Next ➡</button>
+    Page {{$ctrl.currentPage}} of {{$ctrl.totalPages}}
+    <button ng-click="$ctrl.nextPage()" ng-disabled="$ctrl.currentPage === $ctrl.totalPages">Next ➡</button>
   </div>
 </div>
 

@@ -1,25 +1,99 @@
 <div ng-if="$ctrl.form">
-    <h2>Edit Merchant</h2>
-    <form ng-submit="$ctrl.updateMerchant()">
+  <h2>Edit Merchant</h2>
+
+  <form name="merchantEditForm" ng-submit="$ctrl.updateMerchant(merchantEditForm)" novalidate>
+
+    <!-- Merchant Name -->
+    <div class="form-group" ng-class="{ 'has-error': merchantEditForm.merchantName.$touched && merchantEditForm.merchantName.$invalid }">
       <label>Merchant Name:</label>
-      <input type="text" ng-model="$ctrl.form.merchantName" required /><br>
-  
+      <input type="text" name="merchantName" ng-model="$ctrl.form.merchantName" required autofocus />
+      <span class="error" ng-show="merchantEditForm.merchantName.$touched && merchantEditForm.merchantName.$invalid">
+        Merchant Name is required.
+      </span>
+    </div>
+
+    <!-- Merchant Account -->
+    <div class="form-group" ng-class="{ 'has-error': merchantEditForm.merchantAccount.$touched && merchantEditForm.merchantAccount.$invalid }">
       <label>Merchant Account:</label>
-      <input type="text" ng-model="$ctrl.form.merchantAccount" required /><br>
-  
+      <input type="text" name="merchantAccount" ng-model="$ctrl.form.merchantAccount" required />
+      <span class="error" ng-show="merchantEditForm.merchantAccount.$touched && merchantEditForm.merchantAccount.$invalid">
+        Merchant Account is required.
+      </span>
+    </div>
+
+    <!-- City -->
+    <div class="form-group">
       <label>City:</label>
-      <input type="text" ng-model="$ctrl.form.address.city" /><br>
-  
+      <input type="text" name="city" ng-model="$ctrl.form.address.city" />
+    </div>
+
+    <!-- State -->
+    <div class="form-group">
       <label>State:</label>
-      <input type="text" ng-model="$ctrl.form.address.state" /><br>
-  
+      <input type="text" name="state" ng-model="$ctrl.form.address.state" />
+    </div>
+
+    <!-- ZIP -->
+    <div class="form-group" ng-class="{ 'has-error': merchantEditForm.zip.$touched && merchantEditForm.zip.$invalid }">
       <label>Zip:</label>
-      <input type="text" ng-model="$ctrl.form.address.zip" /><br>
-  
+      <input type="text" name="zip" ng-model="$ctrl.form.address.zip" ng-pattern="/^\d{5}$/" title="Enter 5-digit ZIP code" />
+      <span class="error" ng-show="merchantEditForm.zip.$touched && merchantEditForm.zip.$error.pattern">
+        ZIP must be 5 digits.
+      </span>
+    </div>
+
+    <!-- Phone -->
+    <div class="form-group" ng-class="{ 'has-error': merchantEditForm.phone.$touched && merchantEditForm.phone.$invalid }">
       <label>Phone:</label>
-      <input type="text" ng-model="$ctrl.form.address.phone" /><br><br>
-  
-      <button type="submit">Update Merchant</button>
-    </form>
-  </div>
-  
+      <input type="text" name="phone" ng-model="$ctrl.form.address.phone" ng-pattern="/^\d{10}$/" title="Enter 10-digit phone number" />
+      <span class="error" ng-show="merchantEditForm.phone.$touched && merchantEditForm.phone.$error.pattern">
+        Phone must be 10 digits.
+      </span>
+    </div>
+
+    <!-- Global form validation -->
+    <p class="error" ng-show="merchantEditForm.$submitted && merchantEditForm.$invalid">
+      Please fill out all required fields correctly.
+    </p>
+
+    <!-- Buttons -->
+    <button type="submit" ng-disabled="merchantEditForm.$invalid || $ctrl.isLoading">
+      {{$ctrl.isLoading ? 'Updating...' : 'Update Merchant'}}
+    </button>
+    <button type="button" ng-click="$ctrl.resetForm()">Reset</button>
+    <button type="button" ng-click="$ctrl.cancelEdit()">Cancel</button>
+  </form>
+</div>
+
+<style>
+  .error {
+    color: red;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .has-error input {
+    border: 1px solid red;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input {
+    width: 300px;
+    padding: 5px;
+  }
+
+  button {
+    margin-top: 10px;
+    margin-right: 8px;
+  }
+</style>

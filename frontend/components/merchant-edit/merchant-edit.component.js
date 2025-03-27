@@ -1,46 +1,76 @@
 angular.module('MerchantApp').component('merchantEdit', {
   templateUrl: 'components/merchant-edit/merchant-edit.component.html',
-  controller: function($http, $routeParams, $location) {
+  controller: function($http, $routeParams, $location, toastr) {
     const vm = this;
     const id = $routeParams.id;
 
-    console.log("🔍 Inside merchantEdit controller");
-    console.log("🧪 Route param ID:", id);
+    vm.form = null;
+    vm.originalForm = null;
+    vm.isLoading = false;
 
-    vm.form = null; // Start with null to control rendering
+    console.log("✅ Merchant Edit Initialized. ID:", id);
 
-    // Load existing merchant data
+    // Load merchant data
     vm.$onInit = function() {
-      console.log("🚀 $onInit triggered");
-
       $http.get(`/api/merchants/${id}`)
         .then(res => {
-          console.log("✅ Fetched merchant:", res.data);
+          vm.originalForm = angular.copy(res.data);
           vm.form = angular.copy(res.data);
         })
         .catch(err => {
           console.error('❌ Error fetching merchant:', err);
         });
+
+      // Warn on window close if form is dirty
+      window.onbeforeunload = function() {
+        if (vm.form && vm.originalForm && !angular.equals(vm.form, vm.originalForm)) {
+          return "You have unsaved changes. Are you sure you want to leave?";
+        }
+      };
     };
 
-    // Update merchant (strip Mongo fields)
-    vm.updateMerchant = function() {
+    // Update merchant
+    vm.updateMerchant = function(form) {
+      if (form.$invalid) {
+        return;
+      }
+
       const cleanedForm = angular.copy(vm.form);
       delete cleanedForm._id;
       delete cleanedForm.__v;
 
-      console.log("📤 Updating merchant with data:", cleanedForm);
+      vm.isLoading = true;
 
       $http.put(`/api/merchants/${id}`, cleanedForm)
         .then(() => {
-          console.log("✅ Merchant updated successfully");
-          $location.path('/');
+          toastr.success('Merchant updated successfully!');
+          window.onbeforeunload = null; // Remove unload warning
+          setTimeout(() => $location.path('/'), 1200);
         })
         .catch(err => {
+          toastr.error('Something went wrong while updating.');
           console.error('❌ Error updating merchant:', err);
+        })
+        .finally(() => {
+          vm.isLoading = false;
         });
+    };
+
+    // Reset form to original state
+    vm.resetForm = function() {
+      vm.form = angular.copy(vm.originalForm);
+    };
+
+    // Cancel with dirty check
+    vm.cancelEdit = function() {
+      if (!angular.equals(vm.form, vm.originalForm)) {
+        if (confirm("Discard changes and exit?")) {
+          window.onbeforeunload = null;
+          $location.path('/');
+        }
+      } else {
+        $location.path('/');
+      }
     };
   }
 });
-// This component allows editing of a merchant's details.
-// It fetches the existing data on initialization and updates it upon form submission.

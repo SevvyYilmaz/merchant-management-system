@@ -1,11 +1,19 @@
 import mongoose from 'mongoose';
 
-const ResidualSchema = new mongoose.Schema({
-  merchant: { type: mongoose.Schema.Types.ObjectId, ref: 'Merchant', required: true },
-  residualMonth: { type: String, required: true },
-  residualAmount: { type: Number, required: true }
-});
+const residualSchema = new mongoose.Schema({
+  merchantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Merchant',
+    required: true
+  },
+  month: {
+    type: String, // format: YYYY-MM
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true
+  }
+}, { timestamps: true });
 
-const Residual = mongoose.model('Residual', ResidualSchema);
-
-export default Residual;
+export default mongoose.model('Residual', residualSchema);
