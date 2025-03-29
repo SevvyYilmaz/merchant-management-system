@@ -1,0 +1,45 @@
+<div class="devices">
+    <h2>💳 Device Management</h2>
+  
+    <!-- Device Creation Form -->
+    <form ng-submit="createDevice()">
+      <input type="text" ng-model="newDevice.merchantId" placeholder="Merchant ID" required />
+      <input type="text" ng-model="newDevice.userId" placeholder="Your User ID" required />
+  
+      <select ng-model="newDevice.make" required>
+        <option value="">Select Make</option>
+        <option ng-repeat="m in makes" value="{{m}}">{{m}}</option>
+      </select>
+  
+      <input type="text" ng-model="newDevice.model" placeholder="Device Model" required />
+      <input type="text" ng-model="newDevice.serialNumber" placeholder="Serial Number" required />
+  
+      <select ng-model="newDevice.status">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+  
+      <button type="submit">Add Device</button>
+    </form>
+  
+    <hr />
+  
+    <h3>📋 Devices</h3>
+  
+    <!-- Filter by Make -->
+    <label>Filter by Make:</label>
+    <select ng-model="filter.make" ng-change="loadDevices()">
+      <option value="">All</option>
+      <option ng-repeat="m in makes" value="{{m}}">{{m}}</option>
+    </select>
+  
+    <ul>
+      <li ng-repeat="device in devices">
+        <a ng-href="#!/devices/{{ device._id }}">
+          <strong>{{device.make}}</strong> - {{device.model}} - SN: {{device.serialNumber}} ({{device.status}})
+        </a>
+        <button ng-click="deleteDevice(device._id)">Delete</button>
+      </li>
+    </ul>
+  </div>
+  

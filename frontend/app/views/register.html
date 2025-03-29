@@ -1,0 +1,18 @@
+<form name="registerForm" ng-submit="register()" novalidate>
+    <input type="text" ng-model="newUser.username" placeholder="Username" required />
+    <div ng-show="registerForm.$submitted && registerForm.username.$error.required">Username is required.</div>
+  
+    <input type="email" ng-model="newUser.email" placeholder="Email" required />
+    <div ng-show="registerForm.$submitted && registerForm.email.$error.required">Email is required.</div>
+  
+    <input type="password" ng-model="newUser.password" placeholder="Password" required />
+    <div ng-show="registerForm.$submitted && registerForm.password.$error.required">Password is required.</div>
+  
+    <select ng-model="newUser.role">
+      <option value="user">Standard</option>
+      <option value="admin">Admin</option>
+    </select>
+  
+    <button type="submit">Register</button>
+  </form>
+  

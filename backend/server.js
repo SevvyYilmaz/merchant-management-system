@@ -1,12 +1,9 @@
-// This is the main entry point for the backend server.
-// It sets up an Express server, connects to MongoDB, and serves the AngularJS frontend.
-// It also mounts API routes for handling requests.
-
+// ✅ Express Server Setup for API + AngularJS Frontend
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";
 import mongoose from "mongoose";
 import path from "path";
+import cors from "cors";
 import { fileURLToPath } from "url";
 import routes from "./routes/index.js";
 
@@ -14,9 +11,22 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
 
-// ✅ Connect to MongoDB
+// ✅ Dynamic CORS Configuration for Local Frontend Ports
+const allowedOrigins = ['http://localhost:3001', 'http://localhost:3003'];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`❌ CORS Blocked Origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
+// ✅ MongoDB Connection
 const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/merchantDB";
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
@@ -25,23 +35,22 @@ mongoose.connect(mongoURI, {
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// ✅ Mount API Routes FIRST
+// ✅ Load Routes
 app.use("/api", routes);
+console.log("✅ Routes Loaded: /auth, /merchants, /users, /devices, /residuals, /dashboard");
 
-// ✅ Static Frontend Serving (AngularJS)
+// ✅ Serve AngularJS Frontend
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Serve static files
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// ✅ LAST: Catch-All for Angular Routes
-// (only hit if no API route or static file matched)
+// ✅ Fallback to index.html for Angular Routes
 app.get('*', (req, res) => {
+  console.log(`🌐 Serving frontend for route: ${req.url}`);
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-// ✅ Start Server
+// ✅ Start the Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);

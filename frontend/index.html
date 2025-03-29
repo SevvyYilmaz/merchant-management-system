@@ -8,25 +8,39 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.11/ngStorage.min.js"></script>
 
-  <!-- Toastr CSS + JS -->
+
+  <!-- Toastr -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/2.1.1/angular-toastr.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/2.1.1/angular-toastr.tpls.min.js"></script>
 
   <!-- App Core -->
-  <script src="app.js"></script>
+  <script src="app/app.module.js"></script>
+  <script src="app/app.routes.js"></script>
 
-  <!-- Components -->
-  <script src="components/merchant-list/merchant-list.component.js"></script>
-  <script src="components/merchant-create/merchant-create.component.js"></script>
-  <script src="components/merchant-edit/merchant-edit.component.js"></script>
-  <script src="components/merchant-profile/merchant-profile.component.js"></script>
-  <script src="components/login/login.component.js"></script>
-  <script src="components/register/register.component.js"></script>
-  <script src="components/reset-password/reset-password.component.js"></script>
-  <script src="components/admin-dashboard/admin-dashboard.component.js"></script>
+  <!-- Services -->
+  <script src="app/services/auth.service.js"></script>
+  <script src="app/services/merchant.service.js"></script>
+  <script src="app/services/residual.service.js"></script>
+  <script src="app/services/user.service.js"></script>
+  <script src="app/services/device.service.js"></script>
+
+
+  <!-- Controllers -->
+  <script src="app/controllers/login.controller.js"></script>
+  <script src="app/controllers/dashboard.controller.js"></script>
+  <script src="app/controllers/merchant.controller.js"></script>
+  <script src="app/controllers/merchantProfile.controller.js"></script>
+  <script src="app/controllers/user.controller.js"></script>
+  <script src="app/controllers/residual.controller.js"></script>
+  <script src="app/controllers/device.controller.js"></script>
+  <script src="app/controllers/register.controller.js"></script>
+  <script src="app/services/user.service.js"></script>
+
+
+  <!-- Optional Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 
   <style>
     body {
@@ -50,16 +64,17 @@
 
   <!-- Navigation -->
   <nav>
-    <a href="#!/">View Merchants</a> |
-    <a href="#!/create">Add Merchant</a> |
+    <a href="#!/dashboard">Dashboard</a> |
+    <a href="#!/merchants">Merchants</a> |
+    <a href="#!/users" ng-if="isAdmin()">Users</a> |
+    <a href="#!/devices" ng-if="isAdmin()">Devices</a> |
+    <a href="#!/residuals">Residuals</a> |
     <a href="#!/register">Register</a> |
     <a href="#!/login" ng-if="!isLoggedIn()">Login</a>
-    <a href="" ng-click="logout()" ng-if="isLoggedIn()">Logout</a> |
-    <a href="#!/reset-password">Forgot Password?</a>
-    <a href="#!/admin">Admin Dashboard</a>
+    <a href="" ng-click="logout()" ng-if="isLoggedIn()">Logout</a>
   </nav>
 
-  <!-- AngularJS Router Outlet -->
+  <!-- AngularJS View Outlet -->
   <div ng-view></div>
 
   <!-- Global Auth Controller -->
@@ -69,6 +84,13 @@
         return !!localStorage.getItem('token');
       };
 
+      $scope.isAdmin = function() {
+        if (!$scope.isLoggedIn()) return false;
+        const token = localStorage.getItem('token');
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role === 'admin';
+      };
+
       $scope.logout = function() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -76,5 +98,6 @@
       };
     });
   </script>
+
 </body>
 </html>

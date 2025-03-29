@@ -1,7 +1,7 @@
 // backend/controllers/dashboardController.js
 import Merchant from '../models/Merchant.js';
-import User from '../models/User.js';
-import Device from '../models/Device.js';
+import User from '../models/userModel.js';
+import Device from '../models/deviceModel.js';
 import Residual from '../models/Residual.js';
 
 export const getAdminDashboardStats = async (req, res) => {

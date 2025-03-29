@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
@@ -9,6 +9,7 @@ export const register = async (req, res) => {
     const user = new User({ username, email, password: hashedPassword, role });
     await user.save();
 
+    console.log("✅ Registered new user:", user.username);
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error("❌ Error registering user:", error);
@@ -21,12 +22,21 @@ export const login = async (req, res) => {
 
   try {
     const { email, password } = req.body;
+
+    // Check if email or password is missing
+    if (!email || !password) {
+      console.warn("⚠️ Missing email or password");
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     const user = await User.findOne({ email });
 
     if (!user) {
       console.log("❌ User not found for email:", email);
       return res.status(400).json({ message: 'User not found' });
     }
+
+    console.log("🔍 Found user:", user.email);
 
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -36,6 +46,7 @@ export const login = async (req, res) => {
     }
 
     console.log("✅ Password match. Creating JWT...");
+
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -43,7 +54,16 @@ export const login = async (req, res) => {
     );
 
     console.log("✅ Token generated:", token);
-    res.json({ token, user: { id: user._id, username: user.username, role: user.role } });
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
 
   } catch (error) {
     console.error("❌ Error logging in:", error);

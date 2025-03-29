@@ -1,0 +1,25 @@
+<div class="merchants">
+    <h2>🏪 Merchants</h2>
+  
+    <div ng-repeat="merchant in merchants" class="merchant-card">
+      <h3>{{ merchant.merchantName }}</h3>
+      <p><strong>MID:</strong> {{ merchant.merchantAccount }}</p>
+      <p><strong>Status:</strong> {{ merchant.status }}</p>
+      <p><strong>Assigned User:</strong> {{ merchant.assignedUser && merchant.assignedUser.username || '[Unassigned]' }}      </p>
+  
+      <!-- Admin-only user assignment -->
+      <div ng-if="isAdmin">
+        <label>Assign to:</label>
+        <select ng-model="selectedUser[merchant._id]" 
+                ng-options="u._id as u.username for u in users">
+          <option value="">[Unassigned]</option>
+        </select>
+        <button ng-click="assignUserToMerchant(merchant._id, selectedUser[merchant._id])">
+          Assign
+        </button>
+      </div>
+  
+      <hr />
+    </div>
+  </div>
+  

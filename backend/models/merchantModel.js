@@ -12,7 +12,7 @@ const MerchantSchema = new mongoose.Schema({
         phone: String
     },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
-    assignedUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    assignedUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     devices: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Device' }]
 });
 

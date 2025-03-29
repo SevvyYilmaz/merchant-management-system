@@ -1,0 +1,32 @@
+<div class="merchant-profile">
+    <h2>Merchant: {{ merchant.merchantName }}</h2>
+  
+    <p><strong>Status:</strong> {{ merchant.status }}</p>
+    <p><strong>Phone:</strong> {{ merchant.address?.phone }}</p>
+    <p><strong>City:</strong> {{ merchant.address?.city }}, {{ merchant.address?.state }}</p>
+  
+    <div ng-if="isAdmin && merchant.assignedUser">
+      <p><strong>Assigned User:</strong> {{ merchant.assignedUser.username }} ({{ merchant.assignedUser.email }})</p>
+    </div>
+  
+    <div ng-if="isAdmin && !merchant.assignedUser">
+      <p><em>[Unassigned]</em></p>
+    </div>
+  
+    <h3>💳 Devices</h3>
+    <ul>
+      <li ng-repeat="device in devices">
+        {{ device.make }} - {{ device.model }} - SN: {{ device.serialNumber }} ({{ device.status }})
+      </li>
+    </ul>
+  
+    <h3>📈 Residual Earnings</h3>
+    <ul>
+      <li ng-repeat="r in residuals">
+        {{ r.month }} - ${{ r.amount }}
+      </li>
+    </ul>
+  
+    <a href="#!/dashboard">⬅ Back to Dashboard</a>
+  </div>
+  

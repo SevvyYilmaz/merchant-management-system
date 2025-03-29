@@ -1,0 +1,28 @@
+<div class="dashboard">
+    <h2>Welcome to the Dashboard</h2>
+    <button ng-click="logout()">Logout</button>
+  
+    <div ng-if="isAdmin">
+      <h3>📋 All Users</h3>
+      <ul>
+        <li ng-repeat="user in users">
+          {{ user.username }} - {{ user.email }} ({{ user.role }})
+        </li>
+      </ul>
+    </div>
+  
+    <h3>🏪 Merchants</h3>
+    <ul>
+      <li ng-repeat="merchant in merchants">
+        {{ merchant.merchantName }} ({{ merchant.status }})
+      </li>
+    </ul>
+  
+    <h3>💰 Residuals ({{residuals.length}} this month)</h3>
+    <ul>
+      <li ng-repeat="r in residuals">
+        {{ r.merchantId.merchantName }} - ${{ r.amount }} ({{ r.month }})
+      </li>
+    </ul>
+  </div>
+  

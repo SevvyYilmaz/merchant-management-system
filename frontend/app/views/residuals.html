@@ -1,0 +1,13 @@
+<div class="residuals">
+    <h2>💰 Residuals for {{ month }}</h2>
+  
+    <label>Select Month:</label>
+    <input type="month" ng-model="month" ng-change="loadResiduals()" />
+  
+    <ul>
+      <li ng-repeat="residual in residuals">
+        {{ residual.merchantId.merchantName }} – ${{ residual.residualAmount }}
+      </li>
+    </ul>
+  </div>
+  

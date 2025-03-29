@@ -1,0 +1,14 @@
+<form name="loginForm" ng-submit="login()" novalidate>
+    <input type="email" ng-model="credentials.email" placeholder="Email" required />
+    <div ng-show="loginForm.$submitted && loginForm.email.$error.required">
+      Email is required.
+    </div>
+  
+    <input type="password" ng-model="credentials.password" placeholder="Password" required />
+    <div ng-show="loginForm.$submitted && loginForm.password.$error.required">
+      Password is required.
+    </div>
+  
+    <button type="submit">Login</button>
+  </form>
+  
