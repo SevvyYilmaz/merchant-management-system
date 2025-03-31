@@ -1,7 +1,11 @@
 angular.module('MerchantApp')
-.service('ResidualService', ['$http', function($http) {
-  const API = 'http://localhost:3000/api/residuals';
+.service('ResidualService', ['$http', 'AuthService', function($http, AuthService) {
+  const API = 'http://localhost:3005/api/residuals';
 
-  this.getByMonth = (month) => $http.get(`${API}/month/${month}`); // 📅 Fetch residuals for month
-  this.create = (residual) => $http.post(API, residual);           // ➕ Add residual entry
+  const authHeader = () => ({
+    headers: { Authorization: `Bearer ${AuthService.getToken()}` }
+  });
+
+  this.getByMonth = (month) => $http.get(`${API}/month/${month}`, authHeader());
+  this.create = (residual) => $http.post(API, residual, authHeader());
 }]);

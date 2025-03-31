@@ -1,13 +1,13 @@
 {
-  "name": "backend",
+  "name": "merchant-management-system",
   "version": "1.0.0",
-  "description": "Management system backend.",
+  "description": "Management system backend + frontend",
   "type": "module",
-  "main": "backend/server.js",
   "scripts": {
     "start": "concurrently \"npm run dev\" \"npm run lite\"",
     "dev": "nodemon backend/server.js",
-    "lite": "lite-server --config bs-config.cjs"
+    "lite": "lite-server --config bs-config.cjs",
+    "reset-db": "node resetDB.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -22,12 +22,8 @@
     "@types/node": "^16.11.7",
     "concurrently": "^8.0.1",
     "connect-history-api-fallback": "^1.6.0",
-    "http-proxy-middleware": "^2.0.6",
+    "http-proxy-middleware": "^2.0.7",
     "lite-server": "^2.6.1",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.5.4"
-  },
-  "author": "",
-  "license": "ISC"
+    "nodemon": "^3.1.9"
+  }
 }

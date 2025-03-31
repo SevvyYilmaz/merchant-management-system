@@ -1,14 +1,146 @@
-<form name="loginForm" ng-submit="login()" novalidate>
-    <input type="email" ng-model="credentials.email" placeholder="Email" required />
-    <div ng-show="loginForm.$submitted && loginForm.email.$error.required">
-      Email is required.
+<div class="login-wrapper">
+  <div class="login-box">
+    <h1 class="app-title">💳 Merchant Management</h1>
+    <p class="subheading">Secure Admin & User Login</p>
+
+    <form name="loginForm" ng-submit="login(loginForm)" novalidate class="login-form">
+      <div class="form-group" ng-class="{ 'has-error': loginForm.email.$touched && loginForm.email.$invalid }">
+        <label>Email</label>
+        <input type="email" name="email" ng-model="form.email" placeholder="you@example.com" required />
+        <span class="error" ng-show="loginForm.email.$touched && loginForm.email.$invalid">Email is required.</span>
+      </div>
+
+      <div class="form-group" ng-class="{ 'has-error': loginForm.password.$touched && loginForm.password.$invalid }">
+        <label>Password</label>
+        <input type="password" name="password" ng-model="form.password" placeholder="••••••••" required />
+        <span class="error" ng-show="loginForm.password.$touched && loginForm.password.$invalid">Password is required.</span>
+      </div>
+
+      <button type="submit" class="btn-primary" ng-disabled="loginForm.$invalid">🔓 Login</button>
+
+      <p class="error text-center" ng-show="loginForm.$submitted && loginForm.$invalid">
+        ⚠️ Please fill in all fields correctly.
+      </p>
+    </form>
+
+    <div class="extras">
+      <a href="#!/reset-password">Forgot Password?</a>
+      <span>•</span>
+      <a href="#!/register">Create Account</a>
     </div>
-  
-    <input type="password" ng-model="credentials.password" placeholder="Password" required />
-    <div ng-show="loginForm.$submitted && loginForm.password.$error.required">
-      Password is required.
-    </div>
-  
-    <button type="submit">Login</button>
-  </form>
-  
+  </div>
+</div>
+
+<style>
+  body {
+    background: #f2f4f8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 92vh;
+  }
+
+  .login-box {
+    background: #fff;
+    padding: 40px 30px 50px;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .app-title {
+    font-size: 24px;
+    margin-bottom: 6px;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .subheading {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 25px;
+  }
+
+  .login-form {
+    text-align: left;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #444;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    transition: border 0.3s ease;
+  }
+
+  input:focus {
+    border-color: #007bff;
+  }
+
+  .has-error input {
+    border-color: #e74c3c;
+  }
+
+  .error {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #005dc1;
+  }
+
+  .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  .extras {
+    margin-top: 25px;
+    font-size: 13px;
+    color: #666;
+  }
+
+  .extras a {
+    color: #007bff;
+    text-decoration: none;
+    margin: 0 5px;
+  }
+
+  .extras a:hover {
+    text-decoration: underline;
+  }
+</style>

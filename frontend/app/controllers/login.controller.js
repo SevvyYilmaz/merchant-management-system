@@ -1,35 +1,50 @@
 angular.module('MerchantApp')
-.controller('LoginController', ['$scope', '$http', '$location', 'AuthService', 'toastr',
-  function($scope, $http, $location, AuthService, toastr) {
+.controller('LoginController', [
+  '$scope', '$http', '$location', 'AuthService', 'toastr', '$localStorage',
+  function($scope, $http, $location, AuthService, toastr, $localStorage) {
     
-    $scope.credentials = {};
+    $scope.form = {
+      email: '',
+      password: ''
+    };
 
-    $scope.login = function() {
-      // 🛑 Validate input first
-      if (!$scope.credentials.email || !$scope.credentials.password) {
-        toastr.error('Please enter both email and password.');
+    $scope.login = function(loginForm) {
+      if (loginForm.$invalid) {
+        toastr.error('Please enter valid credentials.');
         return;
       }
 
-      // 🚀 Attempt login
-      $http.post('http://localhost:3000/api/auth/login', $scope.credentials)
-        .then(res => {
-          const token = res.data.token;
-          const user = res.data.user;
+      const payload = {
+        email: $scope.form.email.trim().toLowerCase(),
+        password: $scope.form.password
+      };
 
-          if (token) {
-            AuthService.setToken(token);
-            localStorage.setItem('user', JSON.stringify(user));
-            toastr.success(`Welcome back, ${user.username}`);
-            $location.path('/dashboard');
-          } else {
-            toastr.error('Login failed: token not received.');
+      $http.post('/api/auth/login', payload)
+        .then(res => {
+          const { token, user } = res.data;
+
+          if (!token || !user) {
+            toastr.error('Login failed: Missing token or user info.');
+            return;
           }
+
+          AuthService.setToken(token);
+          AuthService.setUser(user);
+
+          // ✅ Force-sync to ensure it's saved
+          setTimeout(() => {
+            console.log('📦 Stored user (from login.controller):', $localStorage.user);
+            if ($localStorage.$apply) $localStorage.$apply();
+            localStorage.setItem('ngStorage-user', JSON.stringify(user)); // fallback
+          }, 0);
+
+          toastr.success(`Welcome, ${user.username}`);
+          $location.path(user.role === 'admin' ? '/admin' : '/dashboard');
         })
         .catch(err => {
-          console.error('❌ Login error:', err);
-          const errorMsg = (err.data && err.data.message) || 'Invalid email or password.';
-          toastr.error(errorMsg);
+          const msg = err?.data?.message || 'Invalid email or password.';
+          toastr.error(msg);
         });
     };
-}]);
+  }
+]);

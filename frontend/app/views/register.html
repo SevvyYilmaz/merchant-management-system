@@ -1,18 +1,133 @@
-<form name="registerForm" ng-submit="register()" novalidate>
-    <input type="text" ng-model="newUser.username" placeholder="Username" required />
-    <div ng-show="registerForm.$submitted && registerForm.username.$error.required">Username is required.</div>
-  
-    <input type="email" ng-model="newUser.email" placeholder="Email" required />
-    <div ng-show="registerForm.$submitted && registerForm.email.$error.required">Email is required.</div>
-  
-    <input type="password" ng-model="newUser.password" placeholder="Password" required />
-    <div ng-show="registerForm.$submitted && registerForm.password.$error.required">Password is required.</div>
-  
-    <select ng-model="newUser.role">
-      <option value="user">Standard</option>
-      <option value="admin">Admin</option>
-    </select>
-  
-    <button type="submit">Register</button>
-  </form>
-  
+<div class="register-wrapper">
+  <div class="register-box">
+    <h1 class="app-title">Create Account</h1>
+    <p class="subheading">📝 Join the Merchant Management System</p>
+
+    <form name="registerForm" ng-submit="register()" novalidate class="register-form">
+      <div class="form-group" ng-class="{ 'has-error': errors.username }">
+        <label>Username</label>
+        <input type="text" ng-model="newUser.username" placeholder="johndoe" required />
+        <span class="error" ng-if="errors.username">{{ errors.username }}</span>
+      </div>
+
+      <div class="form-group" ng-class="{ 'has-error': errors.email }">
+        <label>Email</label>
+        <input type="email" ng-model="newUser.email" placeholder="user@example.com" required />
+        <span class="error" ng-if="errors.email">{{ errors.email }}</span>
+      </div>
+
+      <div class="form-group" ng-class="{ 'has-error': errors.password }">
+        <label>Password</label>
+        <input type="{{ showPassword ? 'text' : 'password' }}" ng-model="newUser.password" placeholder="••••••••" required />
+        <span class="error" ng-if="errors.password">{{ errors.password }}</span>
+      </div>
+
+      <div class="form-group" ng-class="{ 'has-error': errors.confirmPassword }">
+        <label>Confirm Password</label>
+        <input type="{{ showPassword ? 'text' : 'password' }}" ng-model="newUser.confirmPassword" placeholder="••••••••" required />
+        <span class="error" ng-if="errors.confirmPassword">{{ errors.confirmPassword }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" ng-model="showPassword" /> Show Password
+        </label>
+      </div>
+
+      <div class="form-group" ng-if="isAdmin">
+        <label>Role</label>
+        <select ng-model="newUser.role" required>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <span class="error" ng-if="errors.role">{{ errors.role }}</span>
+      </div>
+
+      <button type="submit" class="btn-primary" ng-disabled="loading">Register</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .register-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh;
+    background-color: #f9f9f9;
+  }
+
+  .register-box {
+    background: #fff;
+    padding: 35px 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+  }
+
+  .app-title {
+    margin-bottom: 8px;
+    font-size: 24px;
+    color: #2c3e50;
+  }
+
+  .subheading {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 25px;
+  }
+
+  .register-form {
+    text-align: left;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .error {
+    color: red;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .has-error input {
+    border-color: red;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+</style>

@@ -1,37 +1,62 @@
 <div class="users">
-    <h2>👤 User Management</h2>
-  
-    <form ng-submit="createUser()">
-      <input type="text" ng-model="newUser.username" placeholder="Username" required />
-      <input type="email" ng-model="newUser.email" placeholder="Email" required />
-      <input type="password" ng-model="newUser.password" placeholder="Password" required />
-      <select ng-model="newUser.role">
-        <option value="user">Standard</option>
-        <option value="admin">Admin</option>
-      </select>
-      <button type="submit">Create User</button>
-    </form>
-  
-    <hr />
-  
-    <h3>📋 All Users</h3>
-    <ul>
-      <li ng-repeat="user in users">
+  <h2>👤 User Management</h2>
+
+  <form ng-submit="createUser()">
+    <input type="text" ng-model="newUser.username" placeholder="Username" required />
+    <input type="email" ng-model="newUser.email" placeholder="Email" required />
+    <input type="password" ng-model="newUser.password" placeholder="Password" required />
+    <select ng-model="newUser.role" required>
+      <option value="user">Standard</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button type="submit">Create User</button>
+  </form>
+
+  <hr />
+
+  <h3>📋 All Users</h3>
+
+  <label>Filter by Role:
+    <select ng-model="roleFilter">
+      <option value="">All</option>
+      <option value="admin">Admin</option>
+      <option value="user">Standard</option>
+    </select>
+  </label>
+
+  <ul>
+    <li ng-repeat="user in users | filter:{ role: roleFilter }">
+      <!-- Edit Mode -->
+      <div ng-if="editUser && editUser._id === user._id">
+        <input type="text" ng-model="editUser.username" />
+        <input type="email" ng-model="editUser.email" />
+        <select ng-model="editUser.role">
+          <option value="user">Standard</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button ng-click="updateUser()">Save</button>
+        <button ng-click="cancelEdit()">Cancel</button>
+      </div>
+
+      <!-- View Mode -->
+      <div ng-if="!editUser || editUser._id !== user._id">
         <strong>{{ user.username }}</strong> – {{ user.email }} ({{ user.role }})
+        <button ng-click="startEdit(user)">Edit</button>
         <button ng-click="confirmDelete(user._id)">Delete</button>
-      </li>
-    </ul>
-  
-    <div ng-if="showReassignBox">
-      <h4>Reassign Merchants Before Deletion</h4>
-      <select ng-model="reassignToUserId" required>
-        <option ng-repeat="u in users" ng-if="u._id !== deleteUserId" value="{{ u._id }}">
-          {{ u.username }} ({{ u.role }})
-        </option>
-      </select>
-      <br />
-      <button ng-click="deleteUser()">Confirm Delete & Reassign</button>
-      <button ng-click="cancelDelete()">Cancel</button>
-    </div>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Reassign Merchants Before Deleting -->
+  <div ng-if="showReassignBox">
+    <h4>Reassign Merchants Before Deletion</h4>
+    <select ng-model="reassignToUserId" required>
+      <option ng-repeat="u in users" ng-if="u._id !== deleteUserId" value="{{ u._id }}">
+        {{ u.username }} ({{ u.role }})
+      </option>
+    </select>
+    <br />
+    <button ng-click="deleteUser()">Confirm Delete & Reassign</button>
+    <button ng-click="cancelDelete()">Cancel</button>
   </div>
-  
+</div>

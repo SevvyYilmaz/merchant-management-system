@@ -1,21 +1,32 @@
 import express from 'express';
 import {
   getMerchants,
-  getMerchantById,     // ✅ newly added import
+  getMerchantById,
   createMerchant,
   updateMerchant,
   deleteMerchant
 } from '../controllers/merchantController.js';
 
+import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
 
-// ⚠️ Order matters here! The route for fetching a single merchant by ID must come before the general get all merchants route to avoid conflicts.
-// ✅ NEW - fetch a single merchant by ID
-router.get('/:id', getMerchantById); // ✅ NEW - fetch a single merchant by ID
+// ✅ Protect all routes with token verification
+router.use(authenticateUser);
 
-router.get('/', getMerchants);       // Get all merchants
-router.post('/', createMerchant);    // Create merchant
-router.put('/:id', updateMerchant);  // Update merchant
-router.delete('/:id', deleteMerchant); // Delete merchant
+// 📋 Get all merchants (Admins see all, users see assigned ones)
+router.get('/', getMerchants);
+
+// 📄 Get one merchant by ID
+router.get('/:id', getMerchantById);
+
+// ➕ Create new merchant (Admin only)
+router.post('/', authorizeRoles('admin'), createMerchant);
+
+// ✏️ Update merchant (Admin only)
+router.put('/:id', authorizeRoles('admin'), updateMerchant);
+
+// 🗑️ Delete merchant (Admin only)
+router.delete('/:id', authorizeRoles('admin'), deleteMerchant);
 
 export default router;

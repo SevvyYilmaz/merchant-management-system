@@ -32,7 +32,7 @@ export const getResidualsByMerchant = async (req, res) => {
   }
 };
 
-// ✅ Get residuals for a specific month
+// ✅ Get residuals for a specific month (Admin View)
 export const getResidualsByMonth = async (req, res) => {
   const { month } = req.params;
 

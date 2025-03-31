@@ -14,6 +14,14 @@ angular.module('MerchantApp')
       templateUrl: 'app/views/merchants.html',
       controller: 'MerchantController'
     })
+    .when('/merchants/new', {
+      templateUrl: 'app/views/merchant-form.html',
+      controller: 'MerchantController'
+    })
+    .when('/merchants/edit/:id', {
+      templateUrl: 'app/views/merchant-form.html',
+      controller: 'MerchantController'
+    })
     .when('/merchants/:id', {
       templateUrl: 'app/views/merchant-profile.html',
       controller: 'MerchantProfileController'
@@ -30,15 +38,14 @@ angular.module('MerchantApp')
       templateUrl: 'app/views/devices.html',
       controller: 'DeviceController'
     })
+    .when('/devices/:id', {
+      templateUrl: 'app/views/device-profile.html',
+      controller: 'DeviceProfileController'
+    })
     .when('/register', {
-        templateUrl: 'app/views/register.html',
-        controller: 'RegisterController'
-      })
-      .when('/devices/:id', {
-        templateUrl: 'app/views/device-profile.html',
-        controller: 'DeviceProfileController'
-      })
-      
+      templateUrl: 'app/views/register.html',
+      controller: 'RegisterController'
+    })
     .otherwise({ redirectTo: '/login' });
 
   // Optional clean URL support

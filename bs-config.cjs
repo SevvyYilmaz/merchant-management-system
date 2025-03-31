@@ -1,17 +1,24 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
 const history = require('connect-history-api-fallback');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = {
-  port: 3001,
   server: {
-    baseDir: 'frontend',
+    baseDir: ['frontend'],
     middleware: [
+      // 📦 Support AngularJS HTML5 routing
       history(),
+
+      // 🔁 Proxy API requests to backend
       createProxyMiddleware('/api', {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3005',
         changeOrigin: true,
-        secure: false
+        pathRewrite: { '^/api': '/api' }
       })
-    ]
-  }
+    ],
+    routes: {
+      '/node_modules': 'node_modules'
+    }
+  },
+  port: 3001,
+  open: true
 };

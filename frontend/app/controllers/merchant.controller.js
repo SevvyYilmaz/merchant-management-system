@@ -1,62 +1,55 @@
-console.log('📦 MerchantController loaded');
-
 angular.module('MerchantApp')
-.controller('MerchantController', [
-  '$scope', 'MerchantService', 'UserService', 'toastr',
-  function($scope, MerchantService, UserService, toastr) {
+.controller('MerchantController', ['$scope', '$http', '$routeParams', '$location', 'AuthService',
+  function($scope, $http, $routeParams, $location, AuthService) {
 
-    $scope.merchants = [];
-    $scope.users = [];
-    $scope.selectedUser = {};
-    $scope.page = 1;
+  const token = AuthService.getToken();
+  if (!token) return $location.path('/login');
+  const config = { headers: { Authorization: `Bearer ${token}` } };
 
-    // ✅ Load merchants from backend
-    function loadMerchants() {
-      console.log('📡 Loading merchants (Page:', $scope.page, ')');
-      MerchantService.getAll($scope.page)
-        .then(res => {
-          $scope.merchants = res.data.merchants || [];
-          console.log('✅ Merchants loaded:', $scope.merchants);
-        })
-        .catch(err => {
-          console.error('❌ Error loading merchants:', err);
-          toastr.error('Failed to fetch merchants');
-        });
-    }
+  $scope.isEdit = !!$routeParams.id;
+  $scope.merchant = {
+    merchantName: '',
+    merchantAccount: '',
+    status: 'active',
+    address: {
+      city: '',
+      state: '',
+      zip: '',
+      phoneNumber: ''
+    },
+    assignedUser: null
+  };
+  $scope.users = [];
 
-    // ✅ Load all users (admin only)
-    function loadUsers() {
-      console.log('📡 Loading users...');
-      UserService.getAll()
-        .then(res => {
-          $scope.users = res.data;
-          console.log('✅ Users loaded:', $scope.users);
-        })
-        .catch(err => {
-          console.error('❌ Error loading users:', err);
-          toastr.error('Failed to fetch users');
-        });
-    }
+  // Load users (for assignment)
+  $http.get('/api/users', config).then(res => {
+    $scope.users = res.data;
+  });
 
-    // ✅ Assign or reassign merchant to user
-    $scope.assignUserToMerchant = function(merchantId, userId) {
-      if (!userId) return toastr.warning('Please select a user');
+  // If edit mode, load merchant
+  if ($scope.isEdit) {
+    $http.get(`/api/merchants/${$routeParams.id}`, config)
+      .then(res => {
+        $scope.merchant = res.data.merchant || res.data;
+      })
+      .catch(err => console.error('❌ Error loading merchant', err));
+  }
 
-      console.log(`🔁 Assigning user ${userId} to merchant ${merchantId}`);
-      MerchantService.assignToUser(merchantId, userId)
-        .then(() => {
-          toastr.success('Merchant successfully assigned!');
-          loadMerchants();
-        })
-        .catch(err => {
-          console.error('❌ Assignment failed:', err);
-          toastr.error('Assignment failed');
-        });
+  // Submit form (create or update)
+  $scope.submitMerchant = function() {
+    const payload = {
+      ...$scope.merchant,
+      assignedUserId: $scope.merchant.assignedUser || null
     };
 
-    // ✅ Initial fetch
-    console.log('🚀 Init: Fetching merchants + users...');
-    loadMerchants();
-    loadUsers();
-  }
-]);
+    if ($scope.isEdit) {
+      $http.put(`/api/merchants/${$routeParams.id}`, payload, config)
+        .then(() => $location.path('/merchants'))
+        .catch(err => console.error('❌ Update error', err));
+    } else {
+      $http.post('/api/merchants', payload, config)
+        .then(() => $location.path('/merchants'))
+        .catch(err => console.error('❌ Create error', err));
+    }
+  };
+}]);

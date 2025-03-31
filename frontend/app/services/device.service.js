@@ -1,6 +1,6 @@
 angular.module('MerchantApp')
 .service('DeviceService', ['$http', function($http) {
-  const API = 'http://localhost:3000/api/devices';
+  const API = 'http://localhost:3005/api/devices';
 
   this.getAll = () => $http.get(API); // 🔄 Get all devices
   this.getById = id => $http.get(`${API}/${id}`); // 🔍 Get device by ID

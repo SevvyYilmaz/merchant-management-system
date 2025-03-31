@@ -1,6 +1,6 @@
 angular.module('MerchantApp')
 .service('UserService', ['$http', function($http) {
-  const API = 'http://localhost:3000/api/users';
+  const API = 'http://localhost:3005/api/users';
 
   this.getAll = () => $http.get(API);              // ✅ Get all users
   this.getById = id => $http.get(`${API}/${id}`);  // 🔍 Get user by ID

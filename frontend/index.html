@@ -10,10 +10,12 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.11/ngStorage.min.js"></script>
 
-
   <!-- Toastr -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/2.1.1/angular-toastr.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/2.1.1/angular-toastr.tpls.min.js"></script>
+
+  <!-- Favicon Fix -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
   <!-- App Core -->
   <script src="app/app.module.js"></script>
@@ -26,7 +28,6 @@
   <script src="app/services/user.service.js"></script>
   <script src="app/services/device.service.js"></script>
 
-
   <!-- Controllers -->
   <script src="app/controllers/login.controller.js"></script>
   <script src="app/controllers/dashboard.controller.js"></script>
@@ -36,8 +37,7 @@
   <script src="app/controllers/residual.controller.js"></script>
   <script src="app/controllers/device.controller.js"></script>
   <script src="app/controllers/register.controller.js"></script>
-  <script src="app/services/user.service.js"></script>
-
+  <script src="app/controllers/global.controller.js"></script>
 
   <!-- Optional Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -48,6 +48,11 @@
       margin: 20px;
     }
 
+    nav {
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
     nav a {
       text-decoration: none;
       margin-right: 15px;
@@ -56,6 +61,33 @@
     nav a:hover {
       text-decoration: underline;
     }
+
+    .nav-user {
+      float: right;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    hr {
+      margin: 1rem 0;
+    }
+
+    .residual-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .residual-table th {
+      background: #f9f9f9;
+      text-align: left;
+    }
+
+    .residual-table td,
+    .residual-table th {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body ng-controller="GlobalCtrl">
@@ -63,41 +95,23 @@
   <h1>Merchant Dashboard</h1>
 
   <!-- Navigation -->
-  <nav>
+  <nav ng-if="!shouldHideHeader()">
     <a href="#!/dashboard">Dashboard</a> |
     <a href="#!/merchants">Merchants</a> |
     <a href="#!/users" ng-if="isAdmin()">Users</a> |
     <a href="#!/devices" ng-if="isAdmin()">Devices</a> |
     <a href="#!/residuals">Residuals</a> |
-    <a href="#!/register">Register</a> |
+    <a href="#!/register" ng-if="!isLoggedIn() || isAdmin()">Register</a> |
     <a href="#!/login" ng-if="!isLoggedIn()">Login</a>
-    <a href="" ng-click="logout()" ng-if="isLoggedIn()">Logout</a>
+    <a href="" ng-click="logout()" ng-if="isLoggedIn()">🚪 Logout</a>
+
+    <span class="nav-user" ng-if="isLoggedIn()">
+      👤 {{ currentUser.username }} ({{ currentUser.role }})
+    </span>
   </nav>
 
-  <!-- AngularJS View Outlet -->
+  <!-- AngularJS View -->
   <div ng-view></div>
-
-  <!-- Global Auth Controller -->
-  <script>
-    angular.module('MerchantApp').controller('GlobalCtrl', function($scope) {
-      $scope.isLoggedIn = function() {
-        return !!localStorage.getItem('token');
-      };
-
-      $scope.isAdmin = function() {
-        if (!$scope.isLoggedIn()) return false;
-        const token = localStorage.getItem('token');
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.role === 'admin';
-      };
-
-      $scope.logout = function() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '#!/login';
-      };
-    });
-  </script>
 
 </body>
 </html>

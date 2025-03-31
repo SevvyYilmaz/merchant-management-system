@@ -1,109 +1,86 @@
 import Merchant from '../models/merchantModel.js';
+import { v4 as uuidv4 } from 'uuid';
 
-// ✅ Fetch all merchants with pagination + assigned user
-export const getMerchants = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
+// Helper to generate unique MID
+const generateMID = () => 'MID-' + Math.floor(100000 + Math.random() * 900000);
 
-    const [merchants, totalCount] = await Promise.all([
-      Merchant.find()
-        .populate('assignedUser', 'username email')
-        .skip(skip)
-        .limit(limit),
-      Merchant.countDocuments()
-    ]);
-
-    res.json({ merchants, totalCount });
-  } catch (error) {
-    console.error("❌ Error fetching merchants:", error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-// ✅ Fetch single merchant
-export const getMerchantById = async (req, res) => {
-  try {
-    const merchant = await Merchant.findById(req.params.id).populate('assignedUser', 'username email');
-
-    if (!merchant) {
-      return res.status(404).json({ message: "Merchant not found" });
-    }
-
-    res.status(200).json(merchant);
-  } catch (error) {
-    console.error("❌ Error fetching merchant:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-// ✅ Create new merchant
+// ✅ Create Merchant
 export const createMerchant = async (req, res) => {
   try {
-    const { merchantName, merchantAccount, address, assignedUser } = req.body;
+    const { merchantName, address, assignedUserId } = req.body;
 
     const newMerchant = new Merchant({
       merchantName,
-      merchantAccount: merchantAccount || `MID${Date.now()}`,
+      merchantAccount: generateMID(),
       address,
-      assignedUser: assignedUser || null
+      assignedUser: assignedUserId || null,
+      status: 'active'
     });
 
     await newMerchant.save();
     res.status(201).json(newMerchant);
-  } catch (error) {
-    console.error("❌ Error creating merchant:", error);
-    res.status(500).json({ message: "Error creating merchant", error });
+  } catch (err) {
+    console.error('❌ Error creating merchant:', err);
+    res.status(500).json({ message: 'Failed to create merchant' });
   }
 };
 
-// ✅ Update merchant
+// ✅ Get All Merchants
+export const getMerchants = async (req, res) => {
+  try {
+    const merchants = await Merchant.find().populate('assignedUser', 'username email');
+    res.status(200).json(merchants);
+  } catch (err) {
+    console.error('❌ Error fetching merchants:', err);
+    res.status(500).json({ message: 'Failed to fetch merchants' });
+  }
+};
+
+// ✅ Get Merchant by ID (with residuals and user)
+export const getMerchantById = async (req, res) => {
+  try {
+    const merchant = await Merchant.findById(req.params.id).populate('assignedUser', 'username email');
+    if (!merchant) return res.status(404).json({ message: 'Merchant not found' });
+
+    // Optional: Load residuals separately if needed
+    const residuals = await import('../models/residualModel.js').then(m => 
+      m.default.find({ merchantId: req.params.id }).sort({ residualMonth: -1 })
+    );
+
+    res.status(200).json({ merchant, residuals });
+  } catch (err) {
+    console.error('❌ Error loading merchant by ID:', err);
+    res.status(500).json({ message: 'Failed to load merchant' });
+  }
+};
+
+// ✅ Update Merchant (with assignedUser population)
 export const updateMerchant = async (req, res) => {
   try {
-    const updatedMerchant = await Merchant.findByIdAndUpdate(req.params.id, req.body, { new: true });
-
-    if (!updatedMerchant) {
-      return res.status(404).json({ message: "Merchant not found" });
-    }
-
-    res.json(updatedMerchant);
-  } catch (error) {
-    res.status(500).json({ message: "Error updating merchant", error });
-  }
-};
-
-// ✅ Delete merchant
-export const deleteMerchant = async (req, res) => {
-  try {
-    const deletedMerchant = await Merchant.findByIdAndDelete(req.params.id);
-
-    if (!deletedMerchant) {
-      return res.status(404).json({ message: "Merchant not found" });
-    }
-
-    res.json({ message: "Merchant deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting merchant", error });
-  }
-};
-
-// ✅ Assign or Reassign merchant to a user
-export const assignMerchantToUser = async (req, res) => {
-  const { merchantId, userId } = req.body;
-
-  try {
     const updated = await Merchant.findByIdAndUpdate(
-      merchantId,
-      { assignedUser: userId },
+      req.params.id,
+      req.body,
       { new: true }
     ).populate('assignedUser', 'username email');
 
     if (!updated) return res.status(404).json({ message: 'Merchant not found' });
 
-    res.json({ message: 'Merchant assigned successfully', merchant: updated });
+    res.status(200).json(updated);
   } catch (err) {
-    console.error('❌ Error assigning merchant:', err);
-    res.status(500).json({ message: 'Error assigning merchant', error: err.message });
+    console.error('❌ Failed to update merchant:', err);
+    res.status(500).json({ message: 'Update failed' });
+  }
+};
+
+// ✅ Delete Merchant
+export const deleteMerchant = async (req, res) => {
+  try {
+    const deleted = await Merchant.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Merchant not found' });
+
+    res.status(200).json({ message: 'Merchant deleted successfully' });
+  } catch (err) {
+    console.error('❌ Failed to delete merchant:', err);
+    res.status(500).json({ message: 'Delete failed' });
   }
 };

@@ -1,6 +1,6 @@
 angular.module('MerchantApp')
 .service('MerchantService', ['$http', function($http) {
-  const API = 'http://localhost:3000/api/merchants';
+  const API = 'http://localhost:3005/api/merchants';
 
   this.getAll = (page = 1) => $http.get(`${API}?page=${page}`);
   this.getById = id => $http.get(`${API}/${id}`);

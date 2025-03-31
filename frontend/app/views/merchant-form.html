@@ -1,0 +1,36 @@
+<div class="form-container">
+  <h2>{{ isEdit ? 'Edit Merchant' : 'Add Merchant' }}</h2>
+  <form name="merchantForm" ng-submit="submitMerchant()">
+    <label>Merchant Name:</label>
+    <input type="text" ng-model="merchant.merchantName" required>
+
+    <label>Merchant Account:</label>
+    <input type="text" ng-model="merchant.merchantAccount" ng-disabled="isEdit">
+
+    <label>Status:</label>
+    <select ng-model="merchant.status">
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+
+    <label>Phone:</label>
+    <input type="text" ng-model="merchant.address.phoneNumber">
+
+    <label>City:</label>
+    <input type="text" ng-model="merchant.address.city">
+
+    <label>State:</label>
+    <input type="text" ng-model="merchant.address.state">
+
+    <label>Zip:</label>
+    <input type="text" ng-model="merchant.address.zip">
+
+    <label>Assign to User:</label>
+    <select ng-model="merchant.assignedUser" ng-options="u._id as u.username for u in users">
+      <option value="">[Unassigned]</option>
+    </select>
+
+    <button type="submit">💾 Save</button>
+    <a href="#!/merchants">⬅ Back</a>
+  </form>
+</div>
