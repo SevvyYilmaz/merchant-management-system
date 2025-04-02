@@ -1,6 +1,8 @@
 import User from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
+// ------------------- REGISTER -------------------
 export const register = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
@@ -29,37 +31,22 @@ export const register = async (req, res) => {
   }
 };
 
+// ------------------- LOGIN -------------------
 export const login = async (req, res) => {
-  console.log("📥 Login attempt:", req.body);
-
   try {
     const { email, password } = req.body;
 
-    console.log("🔍 Extracted email:", email);
-    console.log("🔍 Extracted password:", password);
-
     if (!email || !password) {
-      console.warn("⚠️ Missing email or password");
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
 
-    if (!user) {
-      console.warn("❌ User not found:", email);
-      return res.status(400).json({ message: 'User not found' });
-    }
-
-    console.log("🔐 Found user:", user.email);
-    console.log("🧠 Incoming password:", password);
-    console.log("🧠 Stored hash:", user.password);
+    if (!user) return res.status(400).json({ message: 'User not found' });
 
     const isMatch = await user.comparePassword(password);
 
-    console.log("🔐 Password match result:", isMatch);
-
     if (!isMatch) {
-      console.warn("❌ Incorrect password for:", email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -69,7 +56,8 @@ export const login = async (req, res) => {
       { expiresIn: '8h' }
     );
 
-    console.log("✅ Logged in:", user.email);
+    user.lastLogin = new Date();
+    await user.save();
 
     res.json({
       token,
@@ -87,6 +75,63 @@ export const login = async (req, res) => {
   }
 };
 
-export const forgotPassword = (req, res) => {
-  res.send("🔧 Forgot Password - Coming Soon");
+// ------------------- FORGOT PASSWORD -------------------
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const token = crypto.randomBytes(20).toString('hex');
+    const expires = Date.now() + 15 * 60 * 1000; // 15 min
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = new Date(expires);
+    await user.save();
+
+    const resetLink = `http://localhost:3001/#!/reset-password/${token}`;
+    console.log(`📬 Reset link for ${email}:`, resetLink);
+
+    res.json({ message: 'Reset link sent! Check console for link (simulated).' });
+
+  } catch (err) {
+    console.error('❌ Forgot password error:', err);
+    res.status(500).json({ message: 'Failed to initiate password reset' });
+  }
+};
+
+// ------------------- RESET PASSWORD -------------------
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  if (!password || password.length < 8) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters' });
+  }
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    user.lastPasswordUpdated = new Date();
+
+    await user.save();
+    res.json({ message: '✅ Password has been reset successfully' });
+
+  } catch (err) {
+    console.error('❌ Reset password error:', err);
+    res.status(500).json({ message: 'Could not reset password' });
+  }
 };

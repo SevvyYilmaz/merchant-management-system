@@ -91,39 +91,95 @@
       padding: 10px;
       border: 1px solid #ccc;
     }
+
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #007bff;
+      backdrop-filter: blur(2px);
+    }
+
+    /* Responsive navbar hamburger */
+    .hamburger {
+      display: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      margin-top: 1rem;
+    }
+
+    .mobile-nav a {
+      margin: 5px 0;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+      nav a, .nav-user {
+        display: none;
+      }
+      .mobile-nav.show {
+        display: flex;
+      }
+    }
   </style>
 </head>
 <body ng-controller="GlobalCtrl">
 
+  <div id="loader" ng-show="isLoading">
+    ⏳ Loading...
+  </div>
+
   <h1>Merchant Dashboard</h1>
 
   <!-- Navigation -->
+  <div class="hamburger" ng-click="toggleMobileNav()">☰</div>
   <nav ng-if="!shouldHideHeader()">
-    <a href="#!/dashboard" ng-if="isLoggedIn()">Dashboard</a>
+    <a href="#/!dashboard" ng-if="isLoggedIn()">Dashboard</a>
     <span ng-if="isLoggedIn()"> | </span>
-
-    <a href="#!/merchants" ng-if="isLoggedIn()">Merchants</a>
+    <a href="#/!merchants" ng-if="isLoggedIn()">Merchants</a>
     <span ng-if="isAdmin()"> | </span>
-
-    <a href="#!/users" ng-if="isAdmin()">Users</a>
+    <a href="#/!users" ng-if="isAdmin()">Users</a>
     <span ng-if="isAdmin()"> | </span>
-
-    <a href="#!/devices" ng-if="isAdmin()">Devices</a>
+    <a href="#/!devices" ng-if="isAdmin()">Devices</a>
     <span ng-if="isLoggedIn()"> | </span>
-
-    <a href="#!/residuals" ng-if="isLoggedIn()">Residuals</a>
+    <a href="#/!residuals" ng-if="isLoggedIn()">Residuals</a>
     <span ng-if="!isLoggedIn() || isAdmin()"> | </span>
-
-    <a href="#!/register" ng-if="!isLoggedIn() || isAdmin()">Register</a>
+    <a href="#/!register" ng-if="!isLoggedIn() || isAdmin()">Register</a>
     <span ng-if="!isLoggedIn()"> | </span>
-
-    <a href="#!/login" ng-if="!isLoggedIn()">Login</a>
-    <a href="" ng-click="logout()" ng-if="isLoggedIn()"> Logout</a>
-
+    <a href="#/!login" ng-if="!isLoggedIn()">Login</a>
+    <a href="" ng-click="logout()" ng-if="isLoggedIn()">Logout</a>
     <span class="nav-user" ng-if="isLoggedIn()">
       👤 {{ currentUser.username }} ({{ currentUser.role }})
     </span>
   </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" ng-class="{ show: showMobileMenu }" ng-if="!shouldHideHeader()">
+    <a href="#/!dashboard" ng-if="isLoggedIn()">Dashboard</a>
+    <a href="#/!merchants" ng-if="isLoggedIn()">Merchants</a>
+    <a href="#/!users" ng-if="isAdmin()">Users</a>
+    <a href="#/!devices" ng-if="isAdmin()">Devices</a>
+    <a href="#/!residuals" ng-if="isLoggedIn()">Residuals</a>
+    <a href="#/!register" ng-if="!isLoggedIn() || isAdmin()">Register</a>
+    <a href="#/!login" ng-if="!isLoggedIn()">Login</a>
+    <a href="" ng-click="logout()" ng-if="isLoggedIn()">Logout</a>
+  </div>
 
   <!-- AngularJS View -->
   <div ng-view></div>

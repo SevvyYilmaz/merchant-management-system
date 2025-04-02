@@ -15,7 +15,9 @@ const userSchema = new mongoose.Schema({
   assignedMerchants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Merchant' }],
   createdAt: { type: Date, default: Date.now },
   lastLogin: Date,
-  lastPasswordUpdated: Date
+  lastPasswordUpdated: Date,
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 });
 
 // 🔐 Automatically hash password before saving (only if modified)

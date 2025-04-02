@@ -46,6 +46,16 @@ angular.module('MerchantApp')
       templateUrl: 'app/views/register.html',
       controller: 'RegisterController'
     })
+    .when('/reset-password', {
+      templateUrl: 'app/views/reset-password.html',
+      controller: 'ResetPasswordController',
+      access: { requiresLogin: false }
+    })
+    .when('/reset-password/:token', {
+      templateUrl: 'app/views/set-new-password.html',
+      controller: 'SetNewPasswordController',
+      access: { requiresLogin: false }
+    })
     .otherwise({ redirectTo: '/login' });
 
   // Optional clean URL support

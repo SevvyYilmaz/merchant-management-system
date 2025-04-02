@@ -1,19 +1,43 @@
 angular.module('MerchantApp')
-.controller('GlobalCtrl', ['$scope', '$location', 'AuthService', function($scope, $location, AuthService) {
-  $scope.isLoggedIn = () => !!AuthService.getToken();
-  $scope.isAdmin = AuthService.isAdmin;
+.controller('GlobalCtrl', [
+  '$scope', '$rootScope', '$location', 'AuthService', '$localStorage',
+  function($scope, $rootScope, $location, AuthService, $localStorage) {
 
-  $scope.logout = () => {
-    AuthService.logout();
-    $location.path('/login');
-  };
+    // 🔐 Access Control Methods
+    $scope.isLoggedIn = () => !!AuthService.getToken();
+    $scope.isAdmin = AuthService.isAdmin;
 
-  // Set current user from token
-  const user = AuthService.getUser();
-  $scope.currentUser = user && user.username ? user : { username: 'Unknown', role: 'N/A' };
+    // 👤 Current User Info
+    $scope.currentUser = AuthService.getUser() || { username: 'Unknown', role: 'N/A' };
 
-  $scope.shouldHideHeader = function () {
-    const path = $location.path();
-    return path === '/login' || path === '/register' || path === '/reset-password';
-  };
-}]);
+    // 🚪 Logout
+    $scope.logout = () => {
+      AuthService.logout();
+      $location.path('/login');
+    };
+
+    // 🚫 Hide nav/header for auth pages
+    $scope.shouldHideHeader = function () {
+      const path = $location.path();
+      return ['/login', '/register', '/reset-password'].some(p => path.includes(p));
+    };
+
+    // 🌐 Global Loader Management
+    $rootScope.isLoading = false;
+
+    // 🔄 Refresh current user on route changes
+    $rootScope.$on('$routeChangeStart', () => {
+      $rootScope.isLoading = true;
+    });
+
+    $rootScope.$on('$routeChangeSuccess', () => {
+      $scope.currentUser = AuthService.getUser() || { username: 'Unknown', role: 'N/A' };
+      $scope.isAdmin = AuthService.isAdmin();
+      $rootScope.isLoading = false;
+    });
+
+    $rootScope.$on('$routeChangeError', () => {
+      $rootScope.isLoading = false;
+    });
+  }
+]);
