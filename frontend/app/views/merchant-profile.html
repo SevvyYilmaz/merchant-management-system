@@ -1,67 +1,83 @@
-<div class="merchant-profile">
-  <h2>Merchant: 
-    <span ng-if="!editMode">{{ merchant.merchantName }}</span>
-    <input ng-if="editMode" ng-model="merchant.merchantName" />
-  </h2>
-
-  <p><strong>Status:</strong> 
-    <span ng-if="!editMode">{{ merchant.status }}</span>
-    <select ng-if="editMode" ng-model="merchant.status">
-      <option value="active">Active</option>
-      <option value="inactive">Inactive</option>
-    </select>
-  </p>
-
-  <p><strong>Phone:</strong>
-    <span ng-if="!editMode">{{ merchant.address && merchant.address.phone }}</span>
-    <input ng-if="editMode" ng-model="merchant.address.phone" />
-  </p>
-
-  <p><strong>City:</strong>
-    <span ng-if="!editMode">{{ merchant.address && merchant.address.city }}</span>
-    <input ng-if="editMode" ng-model="merchant.address.city" />
-  </p>
-
-  <p><strong>State:</strong>
-    <span ng-if="!editMode">{{ merchant.address && merchant.address.state }}</span>
-    <input ng-if="editMode" ng-model="merchant.address.state" />
-  </p>
-
-  <p><strong>Zip:</strong>
-    <span ng-if="!editMode">{{ merchant.address && merchant.address.zip }}</span>
-    <input ng-if="editMode" ng-model="merchant.address.zip" />
-  </p>
-
-  <div ng-if="isAdmin">
-    <p><strong>Assign to User:</strong>
-      <span ng-if="!editMode">
-        {{ merchant.assignedUser?.username || '[Unassigned]' }}
-      </span>
-      <select ng-if="editMode" ng-model="merchant.assignedUser" ng-options="user as user.username for user in users track by user._id">
-        <option value="">-- Unassigned --</option>
-      </select>
-    </p>
+<div class="merchant-profile container mx-auto p-4 bg-white rounded shadow">
+  <!-- 🧾 Header -->
+  <div class="flex justify-between items-center border-b pb-4 mb-6">
+    <h2 class="text-2xl font-bold">
+      Merchant:
+      <span ng-if="!editMode">{{ merchant.merchantName }}</span>
+      <input ng-if="editMode" ng-model="merchant.merchantName" class="input" />
+    </h2>
+    <div ng-if="isAdmin" class="space-x-2">
+      <button ng-if="!editMode" ng-click="toggleEdit()" class="btn btn-secondary">✏️ Edit</button>
+      <button ng-if="editMode" ng-click="updateMerchant()" class="btn btn-success">💾 Save</button>
+      <button ng-if="editMode" ng-click="toggleEdit()" class="btn btn-danger">❌ Cancel</button>
+    </div>
   </div>
 
-  <div class="actions" ng-if="isAdmin">
-    <button ng-if="!editMode" ng-click="toggleEdit()">✏️ Edit</button>
-    <button ng-if="editMode" ng-click="updateMerchant()">💾 Save</button>
-    <button ng-if="editMode" ng-click="toggleEdit()">❌ Cancel</button>
+  <!-- 🗂 Info Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <p><strong>Status:</strong>
+        <span ng-if="!editMode">{{ merchant.status }}</span>
+        <select ng-if="editMode" ng-model="merchant.status" class="input">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </p>
+      <p><strong>Phone:</strong>
+        <span ng-if="!editMode">{{ merchant.address?.phone }}</span>
+        <input ng-if="editMode" ng-model="merchant.address.phone" class="input" />
+      </p>
+      <p ng-if="isAdmin"><strong>Assigned To:</strong>
+        <span ng-if="!editMode">{{ merchant.assignedUser?.username || '[Unassigned]' }}</span>
+        <select ng-if="editMode" ng-model="merchant.assignedUser"
+                ng-options="user as user.username for user in users track by user._id" class="input">
+          <option value="">-- Unassigned --</option>
+        </select>
+      </p>
+    </div>
+    <div>
+      <p><strong>City:</strong>
+        <span ng-if="!editMode">{{ merchant.address?.city }}</span>
+        <input ng-if="editMode" ng-model="merchant.address.city" class="input" />
+      </p>
+      <p><strong>State:</strong>
+        <span ng-if="!editMode">{{ merchant.address?.state }}</span>
+        <input ng-if="editMode" ng-model="merchant.address.state" class="input" />
+      </p>
+      <p><strong>Zip:</strong>
+        <span ng-if="!editMode">{{ merchant.address?.zip }}</span>
+        <input ng-if="editMode" ng-model="merchant.address.zip" class="input" />
+      </p>
+    </div>
   </div>
 
-  <h3>💳 Devices</h3>
-  <ul>
-    <li ng-repeat="device in devices">
-      {{ device.make }} - {{ device.model }} - SN: {{ device.serialNumber }} ({{ device.status }})
-    </li>
-  </ul>
+  <!-- 💳 Devices Section -->
+  <div class="mb-6">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-xl font-semibold">📟 Devices</h3>
+      <a ng-if="isAdmin" href="#!/merchants/{{ merchant._id }}/add-device" class="btn btn-primary">➕ Add Device</a>
+    </div>
+    <ul class="list-disc list-inside">
+      <li ng-if="!devices.length">No devices assigned.</li>
+      <li ng-repeat="device in devices">
+        {{ device.deviceMake }} – {{ device.deviceModel }} – SN: {{ device.deviceSerialNumber }} ({{ device.deviceStatus }})
+      </li>
+    </ul>
+  </div>
 
-  <h3>📈 Residual Earnings</h3>
-  <ul>
-    <li ng-repeat="r in residuals">
-      {{ r.month }} - ${{ r.amount }}
-    </li>
-  </ul>
+  <!-- 📈 Residuals Section -->
+  <div class="mb-6">
+    <h3 class="text-xl font-semibold mb-2">💰 Residual Earnings</h3>
+    <ul class="list-inside list-disc">
+      <li ng-if="!residuals.length">No residuals recorded.</li>
+      <li ng-repeat="r in residuals">
+        {{ r.month }} — ${{ r.residualAmount | number:2 }}
+      </li>
+    </ul>
+  </div>
 
-  <a href="#!/dashboard">⬅ Back to Dashboard</a>
+  <div class="pt-4">
+    <a href="#!/dashboard" class="text-blue-600 hover:underline">⬅ Back to Dashboard</a>
+  </div>
 </div>
+

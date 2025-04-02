@@ -1,62 +1,89 @@
-<div class="users">
-  <h2>👤 User Management</h2>
+<div class="container mx-auto p-6 bg-white rounded shadow">
+  <h2 class="text-2xl font-bold mb-4">👤 User Management</h2>
 
-  <form ng-submit="createUser()">
-    <input type="text" ng-model="newUser.username" placeholder="Username" required />
-    <input type="email" ng-model="newUser.email" placeholder="Email" required />
-    <input type="password" ng-model="newUser.password" placeholder="Password" required />
-    <select ng-model="newUser.role" required>
-      <option value="user">Standard</option>
+  <!-- ➕ Create New User -->
+  <form ng-submit="createUser()" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <input class="input" type="text" ng-model="newUser.username" placeholder="Username" required />
+    <input class="input" type="email" ng-model="newUser.email" placeholder="Email" required />
+    <input class="input" type="password" ng-model="newUser.password" placeholder="Password" required />
+    <select ng-model="newUser.role" class="input">
+      <option value="user">User</option>
       <option value="admin">Admin</option>
     </select>
-    <button type="submit">Create User</button>
+    <div class="md:col-span-2">
+      <button type="submit" class="btn btn-primary">➕ Create User</button>
+    </div>
   </form>
 
-  <hr />
+  <!-- 📋 User List -->
+  <table class="w-full table-auto border-collapse border mb-6">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border p-2">Username</th>
+        <th class="border p-2">Email</th>
+        <th class="border p-2">Role</th>
+        <th class="border p-2">Merchants</th>
+        <th class="border p-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="user in users">
+        <td class="border p-2">
+          <span ng-if="!editUser || editUser._id !== user._id">{{ user.username }}</span>
+          <input ng-if="editUser && editUser._id === user._id" ng-model="editUser.username" class="input" />
+        </td>
+        <td class="border p-2">
+          <span ng-if="!editUser || editUser._id !== user._id">{{ user.email }}</span>
+          <input ng-if="editUser && editUser._id === user._id" ng-model="editUser.email" class="input" />
+        </td>
+        <td class="border p-2">
+          <span ng-if="!editUser || editUser._id !== user._id">{{ user.role }}</span>
+          <select ng-if="editUser && editUser._id === user._id" ng-model="editUser.role" class="input">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </td>
+        <td class="border p-2 text-center">
+          {{ user.assignedMerchants?.length || 0 }}
+        </td>
+        <td class="border p-2 space-x-2">
+          <button ng-if="!editUser || editUser._id !== user._id"
+                  class="btn btn-secondary"
+                  ng-click="startEdit(user)">✏️ Edit</button>
+          <button ng-if="editUser && editUser._id === user._id"
+                  class="btn btn-success"
+                  ng-click="updateUser()">💾 Save</button>
+          <button ng-if="editUser && editUser._id === user._id"
+                  class="btn btn-danger"
+                  ng-click="cancelEdit()">Cancel</button>
+          <button class="btn btn-danger" ng-click="confirmDelete(user)">🗑 Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-  <h3>📋 All Users</h3>
+  <!-- 🔁 Reassignment Prompt -->
+  <div ng-if="showReassignBox" class="border p-4 bg-yellow-50 rounded">
+    <h3 class="text-lg font-semibold mb-2">⚠️ Confirm Delete</h3>
+    <p class="mb-2">
+      You're about to delete a user assigned to <strong>{{ merchantCount }}</strong> merchant<span ng-if="merchantCount !== 1">s</span>.
+    </p>
 
-  <label>Filter by Role:
-    <select ng-model="roleFilter">
-      <option value="">All</option>
-      <option value="admin">Admin</option>
-      <option value="user">Standard</option>
-    </select>
-  </label>
+    <div ng-if="merchantCount > 0" class="mb-3">
+      <label for="reassignToUserId" class="block mb-1">Reassign merchants to:</label>
+      <select id="reassignToUserId"
+              ng-model="reassignToUserId"
+              class="input w-full">
+        <option value="">-- Select Replacement User --</option>
+        <option ng-repeat="user in users" ng-if="user._id !== deleteUserId" value="{{ user._id }}">
+          {{ user.username }} ({{ user.email }})
+        </option>
+      </select>
+    </div>
 
-  <ul>
-    <li ng-repeat="user in users | filter:{ role: roleFilter }">
-      <!-- Edit Mode -->
-      <div ng-if="editUser && editUser._id === user._id">
-        <input type="text" ng-model="editUser.username" />
-        <input type="email" ng-model="editUser.email" />
-        <select ng-model="editUser.role">
-          <option value="user">Standard</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button ng-click="updateUser()">Save</button>
-        <button ng-click="cancelEdit()">Cancel</button>
-      </div>
-
-      <!-- View Mode -->
-      <div ng-if="!editUser || editUser._id !== user._id">
-        <strong>{{ user.username }}</strong> – {{ user.email }} ({{ user.role }})
-        <button ng-click="startEdit(user)">Edit</button>
-        <button ng-click="confirmDelete(user._id)">Delete</button>
-      </div>
-    </li>
-  </ul>
-
-  <!-- Reassign Merchants Before Deleting -->
-  <div ng-if="showReassignBox">
-    <h4>Reassign Merchants Before Deletion</h4>
-    <select ng-model="reassignToUserId" required>
-      <option ng-repeat="u in users" ng-if="u._id !== deleteUserId" value="{{ u._id }}">
-        {{ u.username }} ({{ u.role }})
-      </option>
-    </select>
-    <br />
-    <button ng-click="deleteUser()">Confirm Delete & Reassign</button>
-    <button ng-click="cancelDelete()">Cancel</button>
+    <div class="space-x-2">
+      <button class="btn btn-danger" ng-click="deleteUser()">✅ Confirm Delete</button>
+      <button class="btn btn-secondary" ng-click="cancelDelete()">Cancel</button>
+    </div>
   </div>
 </div>

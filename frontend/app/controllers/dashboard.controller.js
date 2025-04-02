@@ -7,33 +7,42 @@ angular.module('MerchantApp')
   $scope.merchants = [];
   $scope.users = [];
   $scope.residuals = [];
-  $scope.selectedMonth = new Date(); // ✅ Fix: use native Date object
+  $scope.selectedMonth = new Date(); 
 
   setTimeout(() => {
-    $scope.currentUser = AuthService.getUserInfo();
+    $scope.currentUser = AuthService.getUser();
     console.log('👤 Current User:', $scope.currentUser);
-    if (!$scope.$$phase) $scope.$apply(); // ensure digest cycle
+    if (!$scope.$$phase) $scope.$apply();
+    loadMerchants();
   }, 0);
 
   const config = {
     headers: { Authorization: `Bearer ${token}` }
   };
 
-  // Load Merchants
-  $http.get('http://localhost:3005/api/merchants', config)
-    .then(res => $scope.merchants = res.data)
-    .catch(err => console.error('❌ Error fetching merchants', err));
+  function loadMerchants() {
+    const user = AuthService.getUser();
+    const isAdmin = user?.role === 'admin';
+    const url = isAdmin
+      ? 'http://localhost:3005/api/merchants?all=true'
+      : 'http://localhost:3005/api/merchants';
 
-  // Load Users (Admin Only)
+    $http.get(url, config)
+      .then(res => {
+        $scope.merchants = res.data;
+        console.log('📦 Merchants loaded:', $scope.merchants);
+      })
+      .catch(err => console.error('❌ Error fetching merchants', err));
+  }
+
   if ($scope.isAdmin()) {
     $http.get('http://localhost:3005/api/users', config)
       .then(res => $scope.users = res.data)
       .catch(err => console.error('❌ Error fetching users', err));
   }
 
-  // Load Residuals by month
   $scope.loadResiduals = () => {
-    const selectedMonthString = $scope.selectedMonth.toISOString().slice(0, 7); // ✅ Fix
+    const selectedMonthString = $scope.selectedMonth.toISOString().slice(0, 7);
     $http.get(`http://localhost:3005/api/residuals/month/${selectedMonthString}`, config)
       .then(res => {
         $scope.residuals = res.data;
@@ -43,15 +52,14 @@ angular.module('MerchantApp')
       .catch(err => console.error('❌ Error fetching residuals', err));
   };
 
-  // Export to CSV
   $scope.exportToCSV = () => {
     if (!$scope.residuals.length) return toastr.warning('No data to export.');
 
     const header = ['Merchant', 'Amount', 'Month'];
     const rows = $scope.residuals.map(r => [
       r.merchantId?.merchantName || 'Unknown',
-      r.amount,
-      r.month
+      r.residualAmount,
+      r.month || r.residualMonth
     ]);
 
     const csvContent = [header, ...rows].map(row => row.join(',')).join('\n');
@@ -66,18 +74,16 @@ angular.module('MerchantApp')
     document.body.removeChild(link);
   };
 
-  // Handle Month Change
   $scope.onMonthChange = () => {
     $scope.loadResiduals();
   };
 
-  // Draw Merchant Residuals Bar Chart
   function drawResidualChart(residuals) {
     const ctx = document.getElementById('residualChart')?.getContext('2d');
     if (!ctx) return;
 
     const labels = residuals.map(r => r.merchantId?.merchantName || '[Unknown]');
-    const values = residuals.map(r => r.amount || 0);
+    const values = residuals.map(r => Number(r.residualAmount || 0));
 
     if (window.residualChartInstance) window.residualChartInstance.destroy();
 
@@ -103,12 +109,10 @@ angular.module('MerchantApp')
     });
   }
 
-  // Total Residual Calculator
   $scope.getTotalResiduals = () => {
-    return $scope.residuals.reduce((sum, r) => sum + Number(r.amount || 0), 0);
+    return $scope.residuals.reduce((sum, r) => sum + Number(r.residualAmount || 0), 0);
   };
 
-  // Draw Residual Trend Chart (Last 6 Months)
   function loadResidualTrendChart() {
     const now = new Date();
     const labels = [];
@@ -123,7 +127,7 @@ angular.module('MerchantApp')
 
     Promise.all(requests).then(responses => {
       const totals = responses.map(res =>
-        res.data.reduce((sum, r) => sum + Number(r.amount || 0), 0)
+        res.data.reduce((sum, r) => sum + Number(r.residualAmount || 0), 0)
       );
 
       const ctx = document.getElementById('residualTrendChart')?.getContext('2d');
@@ -151,7 +155,6 @@ angular.module('MerchantApp')
     });
   }
 
-  // Logout
   $scope.logout = () => {
     AuthService.logout();
     $location.path('/login');

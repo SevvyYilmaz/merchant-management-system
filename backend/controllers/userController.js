@@ -30,7 +30,9 @@ export const getUsers = async (req, res) => {
 // ✅ Get user by ID
 export const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password').populate('assignedMerchants');
+    const user = await User.findById(req.params.id)
+      .select('-password')
+      .populate('assignedMerchants');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
@@ -41,7 +43,10 @@ export const getUserById = async (req, res) => {
 // ✅ Update user
 export const updateUser = async (req, res) => {
   try {
-    const updated = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
+    const updated = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true
+    }).select('-password');
+
     if (!updated) return res.status(404).json({ message: 'User not found' });
     res.json(updated);
   } catch (err) {
@@ -49,7 +54,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// ✅ Delete user with reassignment
+// ✅ Delete user with merchant reassignment
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
   const { reassignToUserId } = req.body;
@@ -58,21 +63,35 @@ export const deleteUser = async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (user.assignedMerchants.length > 0) {
-      if (!reassignToUserId) {
-        return res.status(400).json({ message: 'User has merchants. Reassignment required before deletion.' });
-      }
+    const assignedMerchants = await Merchant.find({ assignedUsers: id });
 
-      // Reassign merchants
-      await Merchant.updateMany(
-        { assignedUser: id },
-        { assignedUser: reassignToUserId }
-      );
+    // 🛑 Reassignment required
+    if (assignedMerchants.length > 0 && !reassignToUserId) {
+      return res.status(400).json({
+        message: 'User has assigned merchants. Reassignment required before deletion.'
+      });
     }
 
+    // ✅ Perform reassignment
+    if (assignedMerchants.length > 0 && reassignToUserId) {
+      await Promise.all(assignedMerchants.map(async merchant => {
+        merchant.assignedUsers = [reassignToUserId]; // enforce one user per merchant
+        await merchant.save();
+      }));
+
+      await User.findByIdAndUpdate(reassignToUserId, {
+        $addToSet: {
+          assignedMerchants: { $each: assignedMerchants.map(m => m._id) }
+        }
+      });
+    }
+
+    // ✅ Delete user
     await User.findByIdAndDelete(id);
-    res.json({ message: 'User deleted successfully' });
+    res.json({ message: 'User deleted and merchants reassigned successfully' });
+
   } catch (err) {
+    console.error('❌ Error in user deletion:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };

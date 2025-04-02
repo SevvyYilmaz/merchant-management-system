@@ -25,10 +25,22 @@ export const createMerchant = async (req, res) => {
   }
 };
 
-// ✅ Get All Merchants
+// ✅ Get Merchants (admin sees all, user sees only their assigned)
 export const getMerchants = async (req, res) => {
   try {
-    const merchants = await Merchant.find().populate('assignedUser', 'username email');
+    const isAdmin = req.user?.role === 'admin';
+    const getAll = req.query.all === 'true';
+
+    let merchants;
+
+    if (isAdmin && getAll) {
+      // Admin requesting all merchants
+      merchants = await Merchant.find().populate('assignedUser', 'username email');
+    } else {
+      // Standard user or admin not requesting all
+      merchants = await Merchant.find({ assignedUser: req.user._id }).populate('assignedUser', 'username email');
+    }
+
     res.status(200).json(merchants);
   } catch (err) {
     console.error('❌ Error fetching merchants:', err);

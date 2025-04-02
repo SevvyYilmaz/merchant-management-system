@@ -14,6 +14,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/2.1.1/angular-toastr.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/2.1.1/angular-toastr.tpls.min.js"></script>
 
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
   <!-- Favicon Fix -->
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
@@ -96,14 +99,26 @@
 
   <!-- Navigation -->
   <nav ng-if="!shouldHideHeader()">
-    <a href="#!/dashboard">Dashboard</a> |
-    <a href="#!/merchants">Merchants</a> |
-    <a href="#!/users" ng-if="isAdmin()">Users</a> |
-    <a href="#!/devices" ng-if="isAdmin()">Devices</a> |
-    <a href="#!/residuals">Residuals</a> |
-    <a href="#!/register" ng-if="!isLoggedIn() || isAdmin()">Register</a> |
+    <a href="#!/dashboard" ng-if="isLoggedIn()">Dashboard</a>
+    <span ng-if="isLoggedIn()"> | </span>
+
+    <a href="#!/merchants" ng-if="isLoggedIn()">Merchants</a>
+    <span ng-if="isAdmin()"> | </span>
+
+    <a href="#!/users" ng-if="isAdmin()">Users</a>
+    <span ng-if="isAdmin()"> | </span>
+
+    <a href="#!/devices" ng-if="isAdmin()">Devices</a>
+    <span ng-if="isLoggedIn()"> | </span>
+
+    <a href="#!/residuals" ng-if="isLoggedIn()">Residuals</a>
+    <span ng-if="!isLoggedIn() || isAdmin()"> | </span>
+
+    <a href="#!/register" ng-if="!isLoggedIn() || isAdmin()">Register</a>
+    <span ng-if="!isLoggedIn()"> | </span>
+
     <a href="#!/login" ng-if="!isLoggedIn()">Login</a>
-    <a href="" ng-click="logout()" ng-if="isLoggedIn()">🚪 Logout</a>
+    <a href="" ng-click="logout()" ng-if="isLoggedIn()"> Logout</a>
 
     <span class="nav-user" ng-if="isLoggedIn()">
       👤 {{ currentUser.username }} ({{ currentUser.role }})

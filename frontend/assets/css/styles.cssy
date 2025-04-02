@@ -1,0 +1,29 @@
+/* styles.css — reusable UI helpers */
+
+.input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.btn {
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.btn-primary { background-color: #2563eb; }
+.btn-secondary { background-color: #6b7280; }
+.btn-success { background-color: #16a34a; }
+.btn-danger { background-color: #dc2626; }
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+

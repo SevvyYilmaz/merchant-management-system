@@ -6,7 +6,7 @@ angular.module('MerchantApp')
       role: 'user'
     };
 
-    $scope.isAdmin = AuthService.isAdmin?.();
+    $scope.isAdmin = AuthService.isAdmin; // ✅ Use function reference
     $scope.errors = {};
     $scope.loading = false;
     $scope.showPassword = false;
@@ -36,7 +36,7 @@ angular.module('MerchantApp')
       if (!u.email) $scope.errors.email = 'Email is required.';
       if (!u.password) $scope.errors.password = 'Password is required.';
       if (!u.confirmPassword) $scope.errors.confirmPassword = 'Please confirm password.';
-      if (!u.role) $scope.errors.role = 'Role is required.';
+      if ($scope.isAdmin() && !u.role) $scope.errors.role = 'Role is required.';
 
       if (u.password && !passwordRegex.test(u.password)) {
         $scope.errors.password = 'Password must be at least 8 characters with 1 uppercase, 1 number, 1 special char.';
@@ -44,6 +44,11 @@ angular.module('MerchantApp')
 
       if (u.password !== u.confirmPassword) {
         $scope.errors.confirmPassword = 'Passwords do not match.';
+      }
+
+      // ✅ Role fallback for non-admins
+      if (!$scope.isAdmin() && !u.role) {
+        u.role = 'user';
       }
 
       if (Object.keys($scope.errors).length > 0) {
@@ -65,7 +70,7 @@ angular.module('MerchantApp')
           const user = res.data.user;
           if (token) {
             AuthService.setToken(token);
-            localStorage.setItem('user', JSON.stringify(user));
+            AuthService.setUser(user);
             toastr.success(`Welcome, ${user.username}`);
             $location.path('/dashboard');
           }

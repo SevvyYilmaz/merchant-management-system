@@ -1,84 +1,159 @@
 <div class="register-container">
-    <h2>Register</h2>
-  
-    <form name="registerForm" ng-submit="$ctrl.register(registerForm)" novalidate>
-      <div class="form-group" ng-class="{ 'has-error': registerForm.username.$touched && registerForm.username.$invalid }">
-        <label>Username:</label>
-        <input type="text" name="username" ng-model="$ctrl.form.username" required />
-        <span class="error" ng-show="registerForm.username.$touched && registerForm.username.$invalid">
-          Username is required.
-        </span>
-      </div>
-  
-      <div class="form-group" ng-class="{ 'has-error': registerForm.email.$touched && registerForm.email.$invalid }">
-        <label>Email:</label>
-        <input type="email" name="email" ng-model="$ctrl.form.email" required />
-        <span class="error" ng-show="registerForm.email.$touched && registerForm.email.$invalid">
-          Valid email is required.
-        </span>
-      </div>
-  
-      <div class="form-group" ng-class="{ 'has-error': registerForm.password.$touched && registerForm.password.$invalid }">
-        <label>Password:</label>
-        <input type="password" name="password" ng-model="$ctrl.form.password" required />
-        <span class="error" ng-show="registerForm.password.$touched && registerForm.password.$invalid">
-          Password is required.
-        </span>
-      </div>
-  
-      <div class="form-group" ng-class="{ 'has-error': registerForm.confirmPassword.$touched && $ctrl.form.password !== $ctrl.confirmPassword }">
-        <label>Confirm Password:</label>
-        <input type="password" name="confirmPassword" ng-model="$ctrl.confirmPassword" required />
-        <span class="error" ng-show="registerForm.confirmPassword.$touched && $ctrl.form.password !== $ctrl.confirmPassword">
-          Passwords do not match.
-        </span>
-      </div>
-  
-      <div class="form-group">
-        <label>Role:</label>
-        <select ng-model="$ctrl.form.role">
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-  
-      <button type="submit" ng-disabled="registerForm.$invalid">
-        Register
-      </button>
-    </form>
-  </div>
-  
-  <style>
-    .register-container {
-      max-width: 400px;
-      margin: 0 auto;
-    }
-    .error {
-      color: red;
-      font-size: 13px;
-      margin-top: 4px;
-      display: block;
-    }
-    .has-error input {
-      border: 1px solid red;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 5px;
-    }
-    input, select {
-      width: 100%;
-      padding: 6px;
-    }
-    button {
-      margin-top: 10px;
-      padding: 8px 16px;
-    }
-  </style>
-  
-  
-  
+  <h2>Create Your Account</h2>
+  <p class="subtext">Join the Merchant Management Platform</p>
+
+  <form name="registerForm" ng-submit="$ctrl.register(registerForm)" novalidate>
+    <!-- Username -->
+    <div class="form-group" ng-class="{ 'has-error': registerForm.username.$touched && (!registerForm.username.$valid || !$ctrl.usernameAvailable) }">
+      <label>Username:</label>
+      <input type="text"
+             name="username"
+             ng-model="$ctrl.form.username"
+             ng-blur="$ctrl.checkUsername()"
+             ng-change="$ctrl.usernameAvailable = true"
+             required />
+      <span class="error" ng-if="registerForm.username.$touched && registerForm.username.$invalid">Username is required.</span>
+      <span class="error" ng-if="!$ctrl.usernameAvailable">Username is already taken.</span>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group" ng-class="{ 'has-error': registerForm.email.$touched && (!registerForm.email.$valid || !$ctrl.emailAvailable) }">
+      <label>Email:</label>
+      <input type="email"
+             name="email"
+             ng-model="$ctrl.form.email"
+             ng-blur="$ctrl.checkEmail()"
+             ng-change="$ctrl.emailAvailable = true"
+             required />
+      <span class="error" ng-if="registerForm.email.$touched && registerForm.email.$invalid">Valid email is required.</span>
+      <span class="error" ng-if="!$ctrl.emailAvailable">Email already exists.</span>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group" ng-class="{ 'has-error': registerForm.password.$touched && registerForm.password.$invalid }">
+      <label>Password:</label>
+      <input type="{{ $ctrl.showPassword ? 'text' : 'password' }}"
+             name="password"
+             ng-model="$ctrl.form.password"
+             ng-change="$ctrl.getPasswordStrength($ctrl.form.password)"
+             required />
+      <small>Password must have 1 uppercase, 1 number, 1 special character.</small>
+      <span class="strength">Strength: {{$ctrl.getPasswordStrength($ctrl.form.password)}}</span>
+      <span class="error" ng-if="registerForm.password.$touched && registerForm.password.$invalid">Password is required.</span>
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="form-group" ng-class="{ 'has-error': registerForm.confirmPassword.$touched && $ctrl.form.password !== $ctrl.confirmPassword }">
+      <label>Confirm Password:</label>
+      <input type="{{ $ctrl.showPassword ? 'text' : 'password' }}"
+             name="confirmPassword"
+             ng-model="$ctrl.confirmPassword"
+             required />
+      <span class="error" ng-if="registerForm.confirmPassword.$touched && $ctrl.form.password !== $ctrl.confirmPassword">
+        Passwords do not match.
+      </span>
+    </div>
+
+    <!-- Toggle Password Visibility -->
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" ng-model="$ctrl.showPassword" />
+        Show Password
+      </label>
+    </div>
+
+    <!-- Role Dropdown (Only for Admins) -->
+    <div class="form-group" ng-if="$ctrl.isAdmin">
+      <label>Role:</label>
+      <select ng-model="$ctrl.form.role" required>
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-primary" ng-disabled="registerForm.$invalid">
+      Register
+    </button>
+  </form>
+</div>
+
+<style>
+  .register-container {
+    max-width: 450px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .subtext {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 25px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .checkbox label {
+    font-weight: normal;
+  }
+
+  .has-error input,
+  .has-error select {
+    border-color: red;
+  }
+
+  .error {
+    color: red;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .strength {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #666;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+</style>

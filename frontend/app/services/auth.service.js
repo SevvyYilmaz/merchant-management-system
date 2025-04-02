@@ -5,8 +5,23 @@ angular.module('MerchantApp')
     return $localStorage.token || null;
   }
 
+  function setToken(token) {
+    $localStorage.token = token;
+  }
+
   function getUser() {
     return $localStorage.user || {};
+  }
+
+  function setUser(user) {
+    const userCopy = angular.copy(user);
+    $localStorage.user = userCopy;
+
+    // ✅ Fallback: ensure syncing in all browsers
+    setTimeout(() => {
+      console.log('✅ User saved to $localStorage:', $localStorage.user);
+      localStorage.setItem('ngStorage-user', JSON.stringify(userCopy));
+    }, 0);
   }
 
   function decodeToken(token) {
@@ -24,43 +39,30 @@ angular.module('MerchantApp')
     return decoded.exp < now;
   }
 
-  return {
-    setToken: function(token) {
-      $localStorage.token = token;
-    },
-    getToken: getToken,
-
-    setUser: function(user) {
-      const userCopy = angular.copy(user);
-      $localStorage.user = userCopy;
-
-      // 🧠 Fallback for localStorage syncing issues
-      setTimeout(() => {
-        console.log('✅ User saved to $localStorage:', $localStorage.user);
-        if ($localStorage.$apply) $localStorage.$apply();
-        localStorage.setItem('ngStorage-user', JSON.stringify(userCopy)); // 🔒 fallback write
-      }, 0);
-    },
-
-    getUser: getUser,
-
-    logout: function() {
-      const token = getToken();
-      if (token) {
-        $http.post('http://localhost:3005/api/auth/logout', {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        }).finally(() => {
-          delete $localStorage.token;
-          delete $localStorage.user;
-          toastr.success('Logged out successfully.');
-          $location.path('/login');
-        });
-      } else {
+  function logout() {
+    const token = getToken();
+    if (token) {
+      $http.post('http://localhost:3005/api/auth/logout', {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).finally(() => {
         delete $localStorage.token;
         delete $localStorage.user;
+        toastr.success('Logged out successfully.');
         $location.path('/login');
-      }
-    },
+      });
+    } else {
+      delete $localStorage.token;
+      delete $localStorage.user;
+      $location.path('/login');
+    }
+  }
+
+  return {
+    setToken,
+    getToken,
+    setUser,
+    getUser,
+    logout,
 
     isAdmin: function() {
       const token = getToken();
@@ -72,8 +74,6 @@ angular.module('MerchantApp')
       const token = getToken();
       if (!token) return false;
       return !isTokenExpired(token);
-    },
-
-    getUserInfo: getUser
+    }
   };
 }]);

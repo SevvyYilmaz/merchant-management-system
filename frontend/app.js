@@ -44,6 +44,17 @@ angular.module('MerchantApp', ['ngRoute', 'ngAnimate', 'toastr'])
       controller: 'UserController',
       access: { requiresLogin: true, role: 'admin' }
     })
+    .when('/residuals', {
+      templateUrl: 'app/views/residuals.html',
+      controller: 'ResidualController',
+      access: { requiresLogin: true }
+    })
+    .when('/merchants/:id/add-device', {
+      templateUrl: 'app/views/device-add.html',
+      controller: 'DeviceController',
+      access: { requiresLogin: true, role: 'admin' }
+    })
+    
     .otherwise({ redirectTo: '/login' });
 
   // Optional: Enable for clean URLs later
@@ -73,10 +84,10 @@ angular.module('MerchantApp', ['ngRoute', 'ngAnimate', 'toastr'])
 })
 
 // 🔐 Route Guard to Enforce Login & Role-Based Access
-.run(function($rootScope, $location) {
+.run(function($rootScope, $location, $localStorage) {
   $rootScope.$on('$routeChangeStart', function(event, next) {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = $localStorage.token;
+    const user = $localStorage.user || {};
 
     if (next.access && next.access.requiresLogin && !token) {
       event.preventDefault();
@@ -91,3 +102,4 @@ angular.module('MerchantApp', ['ngRoute', 'ngAnimate', 'toastr'])
     }
   });
 });
+

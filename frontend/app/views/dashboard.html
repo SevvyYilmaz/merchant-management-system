@@ -1,29 +1,17 @@
 <div class="dashboard-container">
-  <h2>📊 Merchant Dashboard</h2>
-
-  <!-- User Info + Logout -->
+  <!-- User Info -->
   <div ng-if="currentUser" class="user-info">
-    <p>👤 {{ currentUser.username || 'Unknown' }} ({{ currentUser.role || 'N/A' }})</p>
-    <button ng-click="logout()">🚪 Logout</button>
+    <p>👤 {{ currentUser.username || '[Unknown]' }} ({{ currentUser.role || 'N/A' }})</p>
+    <button ng-click="logout()">Logout</button>
   </div>
 
-  <!-- Navigation -->
-  <nav class="dashboard-nav">
-    <a href="#!/dashboard">Dashboard</a>
-    <a href="#!/merchants">Merchants</a>
-    <a href="#!/users" ng-if="isAdmin()">Users</a>
-    <a href="#!/devices" ng-if="isAdmin()">Devices</a>
-    <a href="#!/residuals">Residuals</a>
-    <a href="#!/register" ng-if="isAdmin()">Register</a>
-  </nav>
-
-  <!-- Add Merchant -->
+  <!-- Add Merchant (Admin Only) -->
   <div class="section" ng-if="isAdmin()">
     <h3>➕ Add New Merchant</h3>
     <button ng-click="goToAddMerchant()">Add Merchant</button>
   </div>
 
-  <!-- All Users -->
+  <!-- All Users (Admin Only) -->
   <div class="section" ng-if="isAdmin()">
     <h3>📋 All Users</h3>
     <ul>
@@ -37,13 +25,14 @@
   <div class="section">
     <h3>🏪 Merchants</h3>
     <ul>
+      <li ng-if="!merchants.length">No merchants assigned to you.</li>
       <li ng-repeat="merchant in merchants">
         {{ merchant.merchantName }} ({{ merchant.status }})
       </li>
     </ul>
   </div>
 
-  <!-- Residuals with Month Filter + Chart -->
+  <!-- Residuals Section -->
   <div class="section">
     <h3>💰 Residuals ({{ residuals.length }} this month)</h3>
 
@@ -51,7 +40,7 @@
     <input
       id="monthSelect"
       type="month"
-      ng-model="selectedMonthString"
+      ng-model="selectedMonth"
       ng-change="onMonthChange()" />
 
     <button ng-click="exportToCSV()">⬇️ Export CSV</button>
@@ -67,19 +56,20 @@
         </tr>
       </thead>
       <tbody>
+        <tr ng-if="!residuals.length">
+          <td colspan="3" style="text-align:center">No residuals found for this month.</td>
+        </tr>
         <tr ng-repeat="r in residuals">
-          <td>{{ (r.merchantId && r.merchantId.merchantName) || '[Unknown Merchant]' }}</td>
-          <td>${{ r.amount | number:2 }}</td>
+          <td>{{ r.merchantId && r.merchantId.merchantName || '[Unknown Merchant]' }}</td>
+          <td>${{ r.residualAmount | number:2 }}</td>
           <td>{{ r.month }}</td>
         </tr>
       </tbody>
     </table>
 
-    <!-- Bar Chart: Residuals This Month -->
-    <canvas id="residualChart" height="120"></canvas>
-
-    <!-- Line Chart: 6-Month Trend -->
+    <!-- Charts -->
     <h4>📈 Residual Trend (Last 6 Months)</h4>
+    <canvas id="residualChart" height="120"></canvas>
     <canvas id="residualTrendChart" height="100"></canvas>
   </div>
 </div>

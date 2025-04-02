@@ -24,6 +24,7 @@ angular.module('MerchantApp')
           const { token, user } = res.data;
 
           if (!token || !user) {
+            console.warn('⚠️ Missing login response fields:', res.data);
             toastr.error('Login failed: Missing token or user info.');
             return;
           }
@@ -31,17 +32,11 @@ angular.module('MerchantApp')
           AuthService.setToken(token);
           AuthService.setUser(user);
 
-          // ✅ Force-sync to ensure it's saved
-          setTimeout(() => {
-            console.log('📦 Stored user (from login.controller):', $localStorage.user);
-            if ($localStorage.$apply) $localStorage.$apply();
-            localStorage.setItem('ngStorage-user', JSON.stringify(user)); // fallback
-          }, 0);
-
           toastr.success(`Welcome, ${user.username}`);
           $location.path(user.role === 'admin' ? '/admin' : '/dashboard');
         })
         .catch(err => {
+          console.error('❌ Login request failed:', err);
           const msg = err?.data?.message || 'Invalid email or password.';
           toastr.error(msg);
         });

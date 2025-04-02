@@ -1,5 +1,5 @@
 <div class="residuals container mt-4">
-  <h2>📈 Residuals for {{ month }}</h2>
+  <h2>📈 Residuals for {{ selectedMonth | date:'yyyy-MM' }}</h2>
 
   <div class="form-group mb-3">
     <label for="month"><strong>Select Month:</strong></label>
@@ -7,8 +7,7 @@
       id="month"
       class="form-control"
       type="month"
-      ng-model="month"
-      ng-change="loadResiduals()"
+      ng-model="selectedMonth"
     />
   </div>
 
@@ -17,18 +16,21 @@
       <tr>
         <th>Merchant Name</th>
         <th>Merchant Account</th>
-        <th>Amount</th>
+        <th>Amount ($)</th>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="residual in residuals">
-        <td>{{ residual.merchantId?.merchantName || '[Unknown]' }}</td>
-        <td>{{ residual.merchantId?.merchantAccount || 'N/A' }}</td>
+        <td>{{ residual.merchantId && residual.merchantId.merchantName || '[Unknown]' }}</td>
+        <td>{{ residual.merchantId && residual.merchantId.merchantAccount || 'N/A' }}</td>
         <td>${{ residual.residualAmount | number:2 }}</td>
+      </tr>
+      <tr ng-if="residuals.length === 0">
+        <td colspan="3" class="text-center">No residuals found for this month.</td>
       </tr>
       <tr class="table-success" ng-if="residuals.length">
         <td colspan="2"><strong>Total Residuals</strong></td>
-        <td><strong>${{ getTotalResiduals() | number:2 }}</strong></td>
+        <td><strong>${{ getTotalResiduals() }}</strong></td>
       </tr>
     </tbody>
   </table>

@@ -1,22 +1,34 @@
 angular.module('MerchantApp')
-.controller('DeviceController', ['$scope', '$http', '$routeParams', '$location', 'AuthService',
-  function($scope, $http, $routeParams, $location, AuthService) {
+.controller('DeviceController', [
+  '$scope', '$http', '$routeParams', '$location', 'AuthService', 'toastr',
+  function($scope, $http, $routeParams, $location, AuthService, toastr) {
 
   const token = AuthService.getToken();
   if (!token) return $location.path('/login');
   const config = { headers: { Authorization: `Bearer ${token}` } };
 
-  $scope.device = {};
+  $scope.device = {
+    deviceMake: '',
+    deviceModel: '',
+    deviceSerialNumber: '',
+    deviceStatus: 'active'
+  };
 
   $scope.addDevice = function() {
     const deviceData = {
       ...$scope.device,
       merchantId: $routeParams.id,
-      deviceStatus: 'active'
+      deviceStatus: $scope.device.deviceStatus || 'active'
     };
 
     $http.post('/api/devices', deviceData, config)
-      .then(() => $location.path(`/merchants/${$routeParams.id}`))
-      .catch(err => console.error('❌ Add device failed', err));
+      .then(() => {
+        toastr.success('Device added!');
+        $location.path(`/profile/${$routeParams.id}`);
+      })
+      .catch(err => {
+        console.error('❌ Add device failed', err);
+        toastr.error(err.data?.error || 'Device creation failed');
+      });
   };
 }]);
