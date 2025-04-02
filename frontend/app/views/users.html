@@ -6,17 +6,18 @@
     <input class="input" type="text" ng-model="newUser.username" placeholder="Username" required />
     <input class="input" type="email" ng-model="newUser.email" placeholder="Email" required />
     <input class="input" type="password" ng-model="newUser.password" placeholder="Password" required />
+    <input class="input" type="password" ng-model="newUser.confirmPassword" placeholder="Confirm Password" required />
     <select ng-model="newUser.role" class="input">
       <option value="user">User</option>
       <option value="admin">Admin</option>
     </select>
     <div class="md:col-span-2">
-      <button type="submit" class="btn btn-primary">➕ Create User</button>
+      <button type="submit" class="btn btn-primary w-full">➕ Create User</button>
     </div>
   </form>
 
   <!-- 📋 User List -->
-  <table class="w-full table-auto border-collapse border mb-6">
+  <table class="w-full table-auto border-collapse border mb-6 text-sm md:text-base">
     <thead class="bg-gray-100">
       <tr>
         <th class="border p-2">Username</th>

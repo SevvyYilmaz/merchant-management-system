@@ -2,27 +2,40 @@ angular.module('MerchantApp')
 .controller('MerchantProfileController', [
   '$scope', '$http', '$routeParams', 'AuthService', '$location', 'toastr',
   function($scope, $http, $routeParams, AuthService, $location, toastr) {
+
+    // 🛡 Auth check
     const token = AuthService.getToken();
     if (!token) return $location.path('/login');
 
+    // 🧠 Scope setup
     $scope.isAdmin = AuthService.isAdmin();
     $scope.editMode = false;
-    $scope.merchant = { address: {} }; // 🧠 initialize address to avoid undefined errors
+    $scope.merchant = { address: {} };
     $scope.residuals = [];
     $scope.devices = [];
     $scope.users = [];
 
-    const config = { headers: { Authorization: `Bearer ${token}` } };
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+
     const merchantId = $routeParams.id;
 
+    // 🔄 Load merchant + details
     if (merchantId && merchantId !== 'new') {
-      // ✅ Load merchant
-      $http.get(`/api/merchants/${merchantId}`, config)
+      loadMerchant(merchantId);
+      loadDevices(merchantId);
+      if ($scope.isAdmin) loadUsers();
+    }
+
+    // 📦 Load merchant by ID
+    function loadMerchant(id) {
+      $http.get(`/api/merchants/${id}`, config)
         .then(res => {
           const data = res.data.merchant || res.data;
           $scope.merchant = {
             ...data,
-            address: data.address || {} // 🛡 ensure address is defined
+            address: data.address || {}
           };
           $scope.residuals = res.data.residuals || [];
         })
@@ -31,28 +44,35 @@ angular.module('MerchantApp')
           toastr.error('Could not load merchant.');
           $location.path('/dashboard');
         });
-
-      // ✅ Load devices
-      $http.get(`/api/devices?merchantId=${merchantId}`, config)
-        .then(res => $scope.devices = res.data)
-        .catch(err => console.error('❌ Error fetching devices', err));
-      
-      // ✅ Load users (admin only)
-      if ($scope.isAdmin) {
-        $http.get('/api/users', config)
-          .then(res => $scope.users = res.data)
-          .catch(err => console.error('❌ Error loading users', err));
-      }
     }
 
-    // ✨ Enable editing
+    // 💳 Load devices for merchant
+    function loadDevices(id) {
+      $http.get(`/api/devices?merchantId=${id}`, config)
+        .then(res => $scope.devices = res.data)
+        .catch(err => {
+          console.error('❌ Error fetching devices', err);
+          toastr.error('Could not load devices.');
+        });
+    }
+
+    // 👥 Load users (admin only)
+    function loadUsers() {
+      $http.get('/api/users', config)
+        .then(res => $scope.users = res.data)
+        .catch(err => {
+          console.error('❌ Error loading users', err);
+          toastr.error('Could not load users.');
+        });
+    }
+
+    // ✏️ Toggle Edit Mode
     $scope.toggleEdit = () => {
       $scope.editMode = !$scope.editMode;
     };
 
-    // ✅ Update merchant
+    // 💾 Update Merchant
     $scope.updateMerchant = () => {
-      // Format payload for backend
       const payload = {
         merchantName: $scope.merchant.merchantName,
         address: {
@@ -68,7 +88,7 @@ angular.module('MerchantApp')
       $http.put(`/api/merchants/${merchantId}`, payload, config)
         .then(res => {
           $scope.merchant = res.data;
-          toastr.success('Merchant updated!');
+          toastr.success('✅ Merchant updated successfully!');
           $scope.editMode = false;
         })
         .catch(err => {

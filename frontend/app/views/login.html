@@ -1,22 +1,24 @@
 <div class="login-wrapper">
-  <div class="login-box">
+  <div class="login-box animated fadeIn">
     <h1 class="app-title">💳 Merchant Management</h1>
     <p class="subheading">Secure Admin & User Login</p>
 
     <form name="loginForm" ng-submit="login(loginForm)" novalidate class="login-form">
       <div class="form-group" ng-class="{ 'has-error': loginForm.email.$touched && loginForm.email.$invalid }">
-        <label>Email</label>
-        <input type="email" name="email" ng-model="form.email" placeholder="you@example.com" required />
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" ng-model="form.email" placeholder="you@example.com" required autocomplete="username" />
         <span class="error" ng-show="loginForm.email.$touched && loginForm.email.$invalid">Email is required.</span>
       </div>
 
       <div class="form-group" ng-class="{ 'has-error': loginForm.password.$touched && loginForm.password.$invalid }">
-        <label>Password</label>
-        <input type="password" name="password" ng-model="form.password" placeholder="••••••••" required />
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" ng-model="form.password" placeholder="••••••••" required autocomplete="current-password" />
         <span class="error" ng-show="loginForm.password.$touched && loginForm.password.$invalid">Password is required.</span>
       </div>
 
-      <button type="submit" class="btn-primary" ng-disabled="loginForm.$invalid">🔓 Login</button>
+      <button type="submit" class="btn-primary" ng-disabled="loginForm.$invalid || loading">
+        {{ loading ? '🔄 Logging in...' : '🔓 Login' }}
+      </button>
 
       <p class="error text-center" ng-show="loginForm.$submitted && loginForm.$invalid">
         ⚠️ Please fill in all fields correctly.
@@ -33,38 +35,41 @@
 
 <style>
   body {
-    background: #f2f4f8;
+    background: linear-gradient(135deg, #f2f4f8, #e0e7ff);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
   }
 
   .login-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 92vh;
+    min-height: 100vh;
+    padding: 1rem;
   }
 
   .login-box {
     background: #fff;
     padding: 40px 30px 50px;
     border-radius: 12px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
     max-width: 400px;
     width: 100%;
     text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
   }
 
   .app-title {
     font-size: 24px;
-    margin-bottom: 6px;
-    color: #333;
+    margin-bottom: 10px;
+    color: #2c3e50;
     font-weight: 600;
   }
 
   .subheading {
     font-size: 14px;
     color: #7f8c8d;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
   }
 
   .login-form {
@@ -78,18 +83,18 @@
   label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 500;
-    color: #444;
+    font-weight: 600;
+    color: #34495e;
   }
 
   input {
     width: 100%;
-    padding: 10px 12px;
+    padding: 12px 14px;
     font-size: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccd6dd;
     border-radius: 6px;
     outline: none;
-    transition: border 0.3s ease;
+    transition: border-color 0.3s ease;
   }
 
   input:focus {
@@ -108,7 +113,7 @@
 
   .btn-primary {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: #007bff;
     border: none;
     color: white;
@@ -142,5 +147,25 @@
 
   .extras a:hover {
     text-decoration: underline;
+  }
+
+  @media screen and (max-width: 480px) {
+    .login-box {
+      padding: 30px 20px 40px;
+      border-radius: 10px;
+    }
+
+    .app-title {
+      font-size: 20px;
+    }
+
+    .btn-primary {
+      padding: 12px;
+    }
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
 </style>

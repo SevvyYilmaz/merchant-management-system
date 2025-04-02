@@ -1,51 +1,63 @@
 <div class="register-wrapper">
   <div class="register-box">
-    <h1 class="app-title">Create Account</h1>
-    <p class="subheading">📝 Join the Merchant Management System</p>
+    <h1 class="app-title">📝 Create Account</h1>
+    <p class="subheading">Secure access for Admins & Users</p>
 
-    <form name="registerForm" ng-submit="register()" novalidate class="register-form">
+    <form name="registerForm" ng-submit="register()" novalidate>
+      <!-- Username -->
       <div class="form-group" ng-class="{ 'has-error': errors.username }">
         <label>Username</label>
-        <input type="text" ng-model="newUser.username" placeholder="johndoe" required />
-        <span class="error" ng-if="errors.username">{{ errors.username }}</span>
+        <input type="text" ng-model="newUser.username" required />
+        <span class="error" ng-show="errors.username">{{ errors.username }}</span>
       </div>
 
+      <!-- Email -->
       <div class="form-group" ng-class="{ 'has-error': errors.email }">
         <label>Email</label>
-        <input type="email" ng-model="newUser.email" placeholder="user@example.com" required />
-        <span class="error" ng-if="errors.email">{{ errors.email }}</span>
+        <input type="email" ng-model="newUser.email" required />
+        <span class="error" ng-show="errors.email">{{ errors.email }}</span>
       </div>
 
+      <!-- Password -->
       <div class="form-group" ng-class="{ 'has-error': errors.password }">
         <label>Password</label>
-        <input type="{{ showPassword ? 'text' : 'password' }}" ng-model="newUser.password" placeholder="••••••••" required />
-        <span class="error" ng-if="errors.password">{{ errors.password }}</span>
+        <input type="{{ showPassword ? 'text' : 'password' }}" ng-model="newUser.password" required />
+        <small class="strength">Strength: {{ getPasswordStrength(newUser.password) }}</small>
+        <span class="error" ng-show="errors.password">{{ errors.password }}</span>
       </div>
 
+      <!-- Confirm Password -->
       <div class="form-group" ng-class="{ 'has-error': errors.confirmPassword }">
         <label>Confirm Password</label>
-        <input type="{{ showPassword ? 'text' : 'password' }}" ng-model="newUser.confirmPassword" placeholder="••••••••" required />
-        <span class="error" ng-if="errors.confirmPassword">{{ errors.confirmPassword }}</span>
+        <input type="{{ showPassword ? 'text' : 'password' }}" ng-model="newUser.confirmPassword" required />
+        <span class="error" ng-show="errors.confirmPassword">{{ errors.confirmPassword }}</span>
       </div>
 
-      <div class="form-group">
-        <label>
-          <input type="checkbox" ng-model="showPassword" /> Show Password
-        </label>
+      <!-- Toggle Password Visibility -->
+      <div class="form-toggle">
+        <input type="checkbox" ng-model="showPassword" id="showPass" />
+        <label for="showPass">Show Passwords</label>
       </div>
 
-      <!-- 🔐 Role selector only visible to admins -->
-      <div class="form-group" ng-if="isAdmin()">
+      <!-- Role (Admin only) -->
+      <div class="form-group" ng-if="isAdmin()" ng-class="{ 'has-error': errors.role }">
         <label>Role</label>
         <select ng-model="newUser.role" required>
-          <option value="user">User</option>
+          <option value="user">Standard User</option>
           <option value="admin">Admin</option>
         </select>
-        <span class="error" ng-if="errors.role">{{ errors.role }}</span>
+        <span class="error" ng-show="errors.role">{{ errors.role }}</span>
       </div>
 
-      <button type="submit" class="btn-primary" ng-disabled="loading">Register</button>
+      <!-- Submit -->
+      <button type="submit" class="btn-primary" ng-disabled="loading">
+        {{ loading ? 'Creating...' : '✅ Register' }}
+      </button>
     </form>
+
+    <div class="extras">
+      <a href="#!/login">Already have an account? Login</a>
+    </div>
   </div>
 </div>
 
@@ -54,33 +66,33 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 90vh;
-    background-color: #f9f9f9;
+    min-height: 94vh;
+    background: #f4f6f9;
   }
 
   .register-box {
     background: #fff;
-    padding: 35px 30px 40px;
+    padding: 40px 30px;
     border-radius: 12px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    max-width: 440px;
     width: 100%;
-    max-width: 460px;
     text-align: center;
   }
 
   .app-title {
-    margin-bottom: 8px;
     font-size: 24px;
-    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
   .subheading {
     font-size: 14px;
-    color: #7f8c8d;
-    margin-bottom: 25px;
+    color: #888;
+    margin-bottom: 24px;
   }
 
-  .register-form {
+  form {
     text-align: left;
   }
 
@@ -89,47 +101,94 @@
   }
 
   label {
-    font-weight: 600;
     display: block;
-    margin-bottom: 5px;
+    font-weight: 500;
+    margin-bottom: 6px;
     color: #333;
   }
 
   input, select {
     width: 100%;
     padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
     border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+  }
+
+  input:focus, select:focus {
+    border-color: #007bff;
+  }
+
+  .has-error input, .has-error select {
+    border-color: #e74c3c;
   }
 
   .error {
-    color: red;
-    font-size: 13px;
+    color: #e74c3c;
+    font-size: 12px;
     margin-top: 4px;
-    display: block;
   }
 
-  .has-error input,
-  .has-error select {
-    border-color: red;
+  .strength {
+    font-size: 12px;
+    color: #555;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .form-toggle {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .form-toggle label {
+    margin-left: 6px;
+    font-weight: 400;
+    color: #444;
   }
 
   .btn-primary {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background: #007bff;
     border: none;
     color: white;
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 600;
     border-radius: 6px;
     cursor: pointer;
-    margin-top: 10px;
+    transition: background 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #005dc1;
   }
 
   .btn-primary:disabled {
     background: #ccc;
     cursor: not-allowed;
+  }
+
+  .extras {
+    margin-top: 20px;
+    font-size: 13px;
+  }
+
+  .extras a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .extras a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 480px) {
+    .register-box {
+      padding: 30px 20px;
+    }
   }
 </style>
